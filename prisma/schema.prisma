@@ -1,0 +1,55 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       Int     @id @default(autoincrement())
+  email    String?  @unique
+  username String @unique
+  password String
+  role     Role    @relation(fields: [roleID], references: [id])
+  roleID   Int
+}
+
+model Role {
+  id          Int               @id @default(autoincrement())
+  name        String            @unique
+  users       User[]
+  permissions RolePermissions[]
+}
+
+model RolePermissions {
+  id           Int        @id @default(autoincrement())
+  role         Role       @relation(fields: [roleID], references: [id])
+  roleID       Int
+  permission   Permission @relation(fields: [permissionID], references: [id])
+  permissionID Int
+}
+
+model Permission {
+  id    Int               @id @default(autoincrement())
+  name  String            @unique
+  roles RolePermissions[]
+}
+
+model Inventory {
+  id       Int    @id @default(autoincrement())
+  name     String @unique
+  quantity Int
+}
+
+// npx prisma format
+// npx prisma migrate dev --name init
+// npx prisma push
+
+
+// To manually generate your prisma client, run
+// npx prisma generate
