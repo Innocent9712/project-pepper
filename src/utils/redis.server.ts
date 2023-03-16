@@ -46,6 +46,31 @@ class RedisClient {
     });
   }
 
+  async set(key: string, value: string, expireSeconds: number): Promise<void> {
+    await new Promise<void>((resolve, reject) => {
+      this.redisClient.setex(key, expireSeconds, value, (err: any) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    });
+  }
+  
+  async del(key: string): Promise<number> {
+    return new Promise<number>((resolve, reject) => {
+      this.redisClient.del(key, (err: Error | null, reply: number) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(reply);
+        }
+      });
+    });
+  }
+  
+
   };
   
 
@@ -103,7 +128,7 @@ class RedisClient {
 // }
 const redisClient = new RedisClient();
 console.log(`${redisClient.isAlive()}`)
-module.exports = redisClient;
+export { redis, redisClient };
 
 function async() {
     throw new Error("Function not implemented.");
