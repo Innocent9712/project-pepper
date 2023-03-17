@@ -1,9 +1,12 @@
 import {Role, User, Permission} from "@prisma/client";
+
+const encodedpassword = Buffer.from('superadmin', 'utf8').toString("base64");
+
 export const user: User = {
     id: 1,
     username: 'superadmin',
     email: 'john@doe.com',
-    password: 'c3VwZXJhZG1pbgo=',
+    password: encodedpassword,
     roleID: 1
 }
 
