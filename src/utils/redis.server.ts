@@ -1,4 +1,7 @@
-const redis = require('redis');
+import dotenv, { config } from 'dotenv';
+dotenv.config();
+import redis, { createClient } from 'redis';
+import { promisify } from 'util';
 /**
  * basic usage of creating a connection in redis 
  * const redisClient = redis.createClient({url: process.env.REDIS_URL || 'redis://localhost:6379'});
@@ -13,11 +16,15 @@ async ({ async }: { async: boolean }) => {
 
 class RedisClient {
   redisClient: any;
-
+  
   constructor() {
-    this.redisClient = redis.createClient({
-        host: 'localhost',
-        port: 6379
+    const port :number = process.env.REDIS_PORT ? parseInt(process.env.REDIS_PORT) : 6379;
+    this.redisClient = createClient({
+        socket: {
+          host: process.env.REDIS_HOST || 'localhost',
+          port: port
+        },
+        password: process.env.REDIS_PASSWORD
     });
 
     this.redisClient.on('connect', () => {
@@ -30,48 +37,34 @@ class RedisClient {
     
   }
   // checks if the connection is alive
-  isAlive(): boolean {
-    return this.redisClient.connected;
-  };
+  
+  async isAlive(): Promise<boolean> {
+    const pingAsync = promisify(this.redisClient.ping).bind(this.redisClient);
+    try {
+      const reply = await pingAsync();
+      return reply === 'PONG';
+    } catch (err) {
+      return false;
+    }
+  }
 
   async getRedisValue(key: string): Promise<string> {
-    return new Promise<string>((resolve, reject) => {
-      this.redisClient.get(key, (err:any, reply:any) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(reply);
-        }
-      });
-    });
+    const getAsync = promisify(this.redisClient.get).bind(this.redisClient);
+    return getAsync(key);
   }
 
   async set(key: string, value: string, expireSeconds: number): Promise<void> {
-    await new Promise<void>((resolve, reject) => {
-      this.redisClient.setex(key, expireSeconds, value, (err: any) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve();
-        }
-      });
-    });
+    const setexAsync = promisify(this.redisClient.setex).bind(this.redisClient);
+    await setexAsync(key, expireSeconds, value);
   }
   
   async del(key: string): Promise<number> {
-    return new Promise<number>((resolve, reject) => {
-      this.redisClient.del(key, (err: Error | null, reply: number) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(reply);
-        }
-      });
-    });
+    const delAsync = promisify(this.redisClient.del).bind(this.redisClient);
+    return delAsync(key);
   }
   
 
-  };
+  }
   
 
 
@@ -127,9 +120,13 @@ class RedisClient {
 //   }
 // }
 const redisClient = new RedisClient();
-console.log(`${redisClient.isAlive()}`)
+redisClient.isAlive().then((alive) => {
+  console.log(`Redis client is alive: ${alive}`);
+});
+
 export { redis, redisClient };
 
-function async() {
+/**function async() {
     throw new Error("Function not implemented.");
 }
+*/
