@@ -21,6 +21,8 @@ router.post('/login', (req, res) => {
     auth.login(req, res);
 })
 
+router.post('/logout', auth.logout)
+
 // router.get("/inventory/:id", auth.auth, inventoryController.get)
 
 export default router;

@@ -46,6 +46,21 @@ class Auth {
         }    
     }
 
+    async logout(req: Request, res: Response) {
+        try {
+            const token = req.cookies.token;
+            if (token) {
+                await redisClient.del(token);
+                res.status(200).clearCookie('token').send('Logged out');
+            } else {
+                res.status(401).send('Unauthorized');
+            }
+        } catch (error) {
+            console.log(error);
+            res.status(500).send('Internal server error');
+        }
+    }
+
     async auth(req: AuthRequest, res: Response, next: NextFunction) {
         try {
             const token = req.cookies.token;
