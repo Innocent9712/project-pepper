@@ -1,50 +1,39 @@
-/**
- * glossary:
- * ACL: access control user. i.e a verified user
- */
-import dotenv, { config } from 'dotenv';
-dotenv.config();
-import redis, {createClient, RedisClientType} from 'redis';
+import { promisify } from 'util';
+// import { createClient } from 'redis';
+const redis = require('redis')
 
-console.log(process.env.REDIS_HOST);
-console.log(process.env.REDIS_PORT);
+class RedisClient {
+  private client: any;
+  private isClientConnected: boolean;
 
-const port =process.env.REDIS_PORT ? parseInt(process.env.REDIS_PORT) : 6379;
-const redisClient = redis.createClient({
-  socket: {
-    host: process.env.REDIS_HOST || 'localhost',
-    port: port
-  },
-  password: process.env.REDIS_PASSWORD
-});
-
-redisClient.on('error', (err: any) => {
-  console.error('error connecting to redis server', err);
-})
-
-redisClient.on('connect', () => {
-  console.log('connection was successful');
-})
-
-//redisClient.set('key', 'value');
-const setKey = redisClient.set('key','value');
-redisClient.get('key');
-
-redisClient.del('key');
-
-// how to check if the key was set successfully
-const checkset = (redisClient:any, key:string, value:string) => {
-  return new Promise((resolve, reject) => {
-    redisClient(setKey,(err: any, reply: string) => {
-      if (err) {
-        reject(err);
-      } else if (reply === "OK") {
-        resolve(console.log(reply));
-      } else {
-        reject(new Error("Unexpected Redis reply"));
-      }
+  constructor() {
+    this.client = redis.createClient({url: process.env.REDIS_URL || 'redis://localhost:6379'});
+    this.isClientConnected = false
+    this.client.on('error', (err: Error) => {
+      console.error('Redis client failed to connect:', err.message || err.toString());
+      this.isClientConnected = false;
     });
-  });
+    this.client.on('connect', () => {
+      this.isClientConnected = true;
+    });
+  }
+
+  isAlive(): boolean {
+    return this.isClientConnected;
+  }
+
+  async get(key: string): Promise<string | null> {
+    return promisify(this.client.GET).bind(this.client)(key);
+  }
+
+  async set(key: string, value: string | number | boolean, duration: number): Promise<void> {      
+    await promisify(this.client.SETEX).bind(this.client)(key, duration, String(value));
+  }
+
+  async del(key: string): Promise<void> {
+    await promisify(this.client.DEL).bind(this.client)(key);
+  }
 }
 
-setKey("chizoba", "name")
+export const redisClient = new RedisClient();
+export default redisClient;

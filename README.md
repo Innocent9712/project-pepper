@@ -18,3 +18,16 @@ run `npx prisma db push` to create the tables
 and `npx prisma db seed` to seed the db with some data
 
 run `npm run start-server` to start the server in dev mode
+
+
+### Console Usage
+
+To use the console, ensure you have python venv installed.
+
+run `python -m venv venv` to create a virtual environment
+
+then run `source venv/bin/activate` to activate the virtual environment
+
+then run `pip install -r requirements.txt` to install the dependencies
+
+then run `python console.py` to start the console
