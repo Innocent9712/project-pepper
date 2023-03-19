@@ -15,7 +15,7 @@ class AppController {
             dbStatus = false
         }
 
-        res.status(200).json({ db: true })
+        res.status(200).json({ db: true, redis: redisClient.isAlive() })
     }
 }
 
