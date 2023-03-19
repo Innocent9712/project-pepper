@@ -10,6 +10,17 @@ import { v4 as uuidv4 } from "uuid";
 interface AuthRequest extends Request {
     username?: string;
 }
+
+async function parseCookies(req: AuthRequest) {
+    const cookies: {[key: string]: string} = {};
+    if (req.headers.cookie) {
+        req.headers.cookie.split(';').forEach(cookie => {
+            const parts = cookie.split('=');
+            cookies[parts[0].trim()] = parts[1].trim();
+        });
+    }
+    return cookies;
+}
 class Auth {
     async login(req: Request, res: Response) {
         try {
@@ -48,7 +59,8 @@ class Auth {
 
     async logout(req: Request, res: Response) {
         try {
-            const token = req.cookies.token;
+            const cookies = await parseCookies(req);
+            const {token} = cookies
             if (token) {
                 await redisClient.del(token);
                 res.status(200).clearCookie('token').send('Logged out');
@@ -63,14 +75,15 @@ class Auth {
 
     async auth(req: AuthRequest, res: Response, next: NextFunction) {
         try {
-            const token = req.cookies.token;
+            const cookies = await parseCookies(req);
+            const {token} = cookies
             if (token) {
                 const username = await redisClient.get(token);
                 if (username) {
                     // req.username = username;
                     const user = await db.user.findUnique({ where: { username } });
                     if (user) {
-                        req.username = username
+                        req.body.username = username
                         res.cookie('token', token)
                         next();
                     }

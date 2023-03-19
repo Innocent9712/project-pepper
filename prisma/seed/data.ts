@@ -18,59 +18,74 @@ export const role: Role = {
 export const permissions: Permission[] = [
     {
         id: 1,
-        name: "CreateUser"
+        name: "CreateUser",
+        description: "Create a new User"
     },
     {
         id: 2,
-        name: "ReadUser"
+        name: "ReadUser",
+        description: "Fetch user details"
+
     },
     {
         id: 3,
-        name: "UpdateUser"
+        name: "UpdateUser",
+        description: "Update a user's information"
     },
     {
         id: 4,
-        name: "DeleteUser"
+        name: "DeleteUser",
+        description: "Delete a user"
     },
     {
         id: 5,
-        name: "CreateRole"
+        name: "CreateRole",
+        description: "Create a new role"
     },
     {
         id: 6,
-        name: "ReadRole"
+        name: "ReadRole",
+        description: "Fetch role details"
     },
     {
         id: 7,
         name: "UpdateRole",
+        description: "Update a role's information"
     },
     {
         id: 8,
-        name: "DeleteRole"
+        name: "DeleteRole",
+        description: "Delete a role"
     },
     {
         id: 9,
-        name: "AddItem"
+        name: "AddItem",
+        description: "Add item to inventory"
     },
     {
         id: 10,
-        name: "ReadItem"
+        name: "ReadItem",
+        description: "Get item information from inventory"
     },
     {
         id: 11,
-        name: "UpdateItem"
+        name: "UpdateItem",
+        description: "Update inventory item information"
     },
     {
         id: 12,
-        name: "DeleteItem"
+        name: "DeleteItem",
+        description: "Remove item from inventory"
     },
     {
         id: 13,
-        name: "AddToItem"
+        name: "AddToItem",
+        description: "Add quantity to item"
     },
     {
         id: 14,
-        name: "RemoveFromItem"
+        name: "RemoveFromItem",
+        description: "Remove quantity from item"
     }
 ]
 
