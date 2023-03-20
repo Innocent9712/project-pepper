@@ -31,3 +31,7 @@ then run `source venv/bin/activate` to activate the virtual environment
 then run `pip install -r requirements.txt` to install the dependencies
 
 then run `python console.py` to start the console
+
+### Docs
+
+visit http://localhost:5000/docs to see the documentation

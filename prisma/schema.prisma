@@ -12,8 +12,8 @@ datasource db {
 
 model User {
   id       Int     @id @default(autoincrement())
-  email    String?  @unique
-  username String @unique
+  email    String? @unique
+  username String  @unique
   password String
   role     Role    @relation(fields: [roleID], references: [id])
   roleID   Int
@@ -35,9 +35,10 @@ model RolePermissions {
 }
 
 model Permission {
-  id    Int               @id @default(autoincrement())
-  name  String            @unique
-  roles RolePermissions[]
+  id          Int               @id @default(autoincrement())
+  name        String            @unique
+  description String?
+  roles       RolePermissions[]
 }
 
 model Inventory {
@@ -50,6 +51,9 @@ model Inventory {
 // npx prisma migrate dev --name init
 // npx prisma push
 
-
 // To manually generate your prisma client, run
 // npx prisma generate
+
+
+// To deploy migrations
+// npx prisma migrate deploy
