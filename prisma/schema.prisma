@@ -42,9 +42,10 @@ model Permission {
 }
 
 model Inventory {
-  id       Int    @id @default(autoincrement())
-  name     String @unique
-  quantity Int
+  id          Int     @id @default(autoincrement())
+  name        String  @unique
+  description String?
+  quantity    Int
 }
 
 // npx prisma format
@@ -53,7 +54,6 @@ model Inventory {
 
 // To manually generate your prisma client, run
 // npx prisma generate
-
 
 // To deploy migrations
 // npx prisma migrate deploy
