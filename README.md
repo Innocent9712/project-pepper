@@ -24,7 +24,7 @@ run `npm run start-server` to start the server in dev mode
 
 To use the console, ensure you have python venv installed.
 
-run `python -m venv venv` to create a virtual environment
+run `python3 -m venv venv` to create a virtual environment
 
 then run `source venv/bin/activate` to activate the virtual environment
 

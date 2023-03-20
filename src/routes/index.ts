@@ -60,6 +60,7 @@ router.delete('/roles/:roleID', auth.auth, roleController.deleteRole)
 router.put('/roles/:roleID', auth.auth, roleController.updateRole)
 // curl -XPUT -b "token=ba52ccff-ff97-4995-9366-0af0cbf97dcb" localhost:5000/api/v1/roles/2 -H "Content-Type: application/json" -d '{"name": "temp-rename"}'; echo ""
 
+router.get('/roles/:roleID/permissions', auth.auth, roleController.getRolePermissions)
 // Add permission to a role
 router.post('/roles/:roleID/add-permission', auth.auth, roleController.addPermission)
 // curl -XPOST -b "token=ba52ccff-ff97-4995-9366-0af0cbf97dcb" localhost:5000/api/v1/roles/add-permission?roleID=2&permissionID=3; echo ""
