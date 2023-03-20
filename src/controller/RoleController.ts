@@ -13,7 +13,7 @@ import {BaseController, SUPERADMIN, ADMIN} from "./BaseController";
 import baseController from "./BaseController";
 
 
-async function checkPermission(username: string) {
+export async function checkPermission(username: string) {
   const user: User | null = await db.user.findUnique({
     where: { username },
   });

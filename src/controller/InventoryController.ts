@@ -6,10 +6,14 @@
 
 import { db } from "../utils/db.server";
 import { Request, Response, NextFunction } from "express";
+import { checkPermission } from "./RoleController";
+import {BaseController, SUPERADMIN, ADMIN} from "./BaseController";
 
 interface CreateRequest extends Request {
     name: string;
 }
+
+
 
 class InventoryController {
   static async create(req: Request, res: Response) {
