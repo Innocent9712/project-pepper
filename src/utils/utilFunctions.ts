@@ -43,13 +43,3 @@ export async function checkPermission(username: string) {
     }
     return false;
 };
-
-// This function gets the username from the redis server using the token cookie
-export async function getUsername(req: Request) {
-    const cookies = await parseCookies(req);
-    const {token} = cookies;
-    if (token) {
-        const username = await redisClient.get(token);
-        return username;
-    }
-}
