@@ -8,29 +8,11 @@
 // (Messing with the superadmin role is prohibitted)
 import { db } from "../utils/db.server";
 import { Request, Response, NextFunction } from "express";
-import { Role, RolePermissions, User } from "@prisma/client";
-import {BaseController, SUPERADMIN, ADMIN} from "./BaseController";
-import baseController from "./BaseController";
+import { checkPermission } from "../utils/utilFunctions";
+import { BaseController, SUPERADMIN } from "./BaseController";
+import { Role } from "@prisma/client";
 
 
-export async function checkPermission(username: string) {
-  const user: User | null = await db.user.findUnique({
-    where: { username },
-  });
-
-  if (user) {
-    const userRole: Role | null = await db.role.findUnique({
-      where: { id: user.roleID }
-    })
-
-    if (userRole) {
-      if ([SUPERADMIN, ADMIN].includes(userRole.name)) {
-        return true
-      }
-    }
-  }
-  return false
-}
 class RoleController extends BaseController {
   // private authRoles = ['superadmin', 'admin']
   // private authRoles: string[]

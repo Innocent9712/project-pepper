@@ -6,17 +6,76 @@
 
 import { db } from "../utils/db.server";
 import { Request, Response, NextFunction } from "express";
-import { checkPermission } from "./RoleController";
+import { checkPermission } from "../utils/utilFunctions";
 import {BaseController, SUPERADMIN, ADMIN} from "./BaseController";
+import { PassThrough } from "stream";
+import { getUsername } from "../utils/utilFunctions";
 
 interface CreateRequest extends Request {
     name: string;
 }
 
-
-
 class InventoryController {
-  static async create(req: Request, res: Response) {
+  async create(req: Request, res: Response) {
+    const username = await getUsername(req);
+    if (username) {
+      const user = await db.user.findUnique({ where: { username } });
+      if (user) {
+        const id = user.roleID;
+        const permission = await db.rolePermissions.findFirst({ where: {roleID: id, permissionID: 9}});
+        if (permission) {
+          if (req.body) {
+            console.log(req.body)
+            res.send(req.body)
+            /*
+            try {
+              const { name, description, quantity } = req.body;
+              const newItem = await db.inventory.create({
+                data: {
+                  name: name,
+                  description: description,
+                  quantity: quantity,
+                },
+              });
+              return res.status(201).json({
+                message: "Inventory item created successfully",
+                newItem,
+              });
+            } catch (err) {
+              console.error(err);
+              res.status(500).json({ error: 'Failed to create inventory item' });
+            }
+            */
+          } else {
+            console.log("Missing product information");
+            res.status(400).send('Missing product information')
+          }
+        } else {
+          console.log('You are not authorized to create an inventory item');
+          res.status(401).send('You are not authorized to create an inventory item');
+        }
+      } else {
+          console.log('User not found');
+          res.status(404).send('User not found');
+      }
+    }
+
+    res.status(200);
+  }
+}
+
+
+
+
+
+
+
+
+
+
+/*
+class InventoryControl {
+  static async createInventory(req: Request, res: Response) {
     try {
       const { name, username } = req.body;
 
@@ -37,6 +96,11 @@ class InventoryController {
             description,
             price,
             count,
+
+          name
+          description
+          quantity
+          
           },
         });
 
@@ -121,5 +185,6 @@ class InventoryController {
 
   }
 
+  */
 const inventoryController = new InventoryController();
 export default inventoryController;
