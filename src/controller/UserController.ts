@@ -6,76 +6,77 @@
 
 import { db } from "../utils/db.server";
 import { Request, Response, NextFunction } from "express";
+import {BaseController, SUPERADMIN, ADMIN} from "./BaseController";
+import { User } from "@prisma/client";
 
-class UserController {
-  static async create(req: Request, res: Response) {
-    try {
-      const { name, username, password, roleID } = req.body;
-
-      const role = await db.role.findFirst({
-        where: {
-          id: roleID,
-        },
-      });
-
-      if (role?.name === "superadmin") {
-        return res.status(401).json({
-          message: "You are not authorized to create a superadmin user",
-        });
-      }
-
-      const user = await db.user.create({
-        data: {
-          name,
-          username,
-          password,
-          roleID,
-        },
-      });
-
-      return res.status(201).json({
-        message: "User created successfully",
-        user,
-      });
-    } catch (error) {
-      return res.status(500).json({
-        message: "Something went wrong",
-        error: error.message,
-      });
-    }
+class UserController extends BaseController {
+  constructor() {
+    super();
   }
 
-  static async fetch(req: Request, res: Response) {
+  async create(req: Request, res: Response) {
     try {
-      const { id } = req.params;
-
-      const user = await db.user.findFirst({
+      const { name, username, email, password, roleID } = req.body;
+      // check if user is superadmin or admin
+      const user = await db.user.findUnique({
         where: {
-          id,
+          id: req.body?.id,
         },
+        include: {
+          role: true,
+        }
+      });
+      // if user is not superadmin or admin, return 401
+      if (!user) { 
+        return res.status(401).json({ 
+          message: "You are not authorized to create a user" 
+        });
+      } else{
+        // if user is superadmin or admin, create a user
+        const user= await db.user.create({
+          data: {
+            id: req.body?.id,
+            email: req.body?.email,
+            username,
+            password,
+            roleID,
+          },
+        });
+      }
+    } catch (error:any) {
+      return res.status(500).json({message: "Something went wrong", error: error.message});
+    }
+  }
+  
+
+  async fetch(req: Request, res: Response) {
+    // fetch user details.
+    try {
+      const user = await db.user.findUnique({
+        where: {
+          id: req.body?.id,
+        },
+        include: {
+          role: true,
+        }
       });
 
-      const role = await db.role.findFirst({
-        where: {
-          id: user?.roleID,
-        },
-      });
-
-      if (
-        role?.name === "superadmin" ||
-        role?.name === "admin" ||
-        req.user?.id === user?.id
-      ) {
+      if (!user) {
+        return res.status(401).json({
+          message: "You are not authorized to fetch this user"
+        })
+      }
+      if (user.role.name !== 'admin' && user.role.name !== 'superadmin') {
+        return res.status(401).json({
+          message: "You are not allowed to fetch this user"
+        });
+      } else {
         return res.status(200).json({
           message: "User fetched successfully",
           user,
         });
-      } else {
-        return res.status(401).json({
-          message: "You are not authorized to fetch this user",
-        });
       }
-    } catch (error) {
+    } catch (error:any) {
       return res.status(500).json({
         message: "Something went wrong",
         error: error.message,
@@ -83,14 +84,14 @@ class UserController {
     }
   }
 
-  static async update(req: Request, res: Response) {
+  async update(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const { name, username, password, roleID } = req.body;
+      const { name, email, username, password, roleID } = req.body;
 
       const user = await db.user.findFirst({
         where: {
-          id,
+          id: req.body?.id,
         },
       });
 
@@ -103,14 +104,19 @@ class UserController {
       if (
         role?.name === "superadmin" ||
         role?.name === "admin" ||
-        req.user?.id === user?.id
+        req.body?.id === user?.id
 
         ) {
             await db.user.update({
-              name,
-              username,
-              password,
-              roleID,
+              where: {
+                id: req.body?.id,
+              },
+              data: {
+                username,
+                email,
+                password,
+                roleID,
+              },
             });
 
             return res.status(200).json({
@@ -122,7 +128,65 @@ class UserController {
             message: "You are not authorized to update this user",
           });
         }
-    } catch (error) {
+    } catch (error:any) {
+      return res.status(500).json({
+        message: "Something went wrong",
+        error: error.message,
+      });
+    }
+  }
+  async delete(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+
+      const user = await db.user.findFirst({
+        where: {
+          id: req.params,
+        },
+      });
+
+      const role = await db.role.findFirst({
+        where: {
+          id: user?.roleID,
+        },
+      });
+
+      if (role?.name === "superadmin" || role?.name === "admin") {
+        await db.user.delete({
+          where: {
+            id: req.body?.id,
+          },
+        });
+
+        return res.status(200).json({
+          message: "User deleted successfully",
+        });
+      } else {
+        return res.status(401).json({
+          message: "You are not authorized to delete this user",
+        });
+      }
+    } catch (error:any) {
+      return res.status(500).json({
+        message: "Something went wrong",
+        error: error.message,
+      });
+    }
+  }
+
+  async getAll(req: Request, res: Response) {
+    try {
+      const users = await db.user.findMany({
+        include: {
+          role: true,
+        },
+      });
+
+      return res.status(200).json({
+        message: "Users fetched successfully",
+        users,
+      });
+    } catch (error:any) {
       return res.status(500).json({
         message: "Something went wrong",
         error: error.message,

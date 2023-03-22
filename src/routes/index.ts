@@ -70,5 +70,14 @@ router.delete('/roles/:roleID/remove-permission', auth.auth, roleController.remo
 // Get all permissions
 router.get('/permissions', auth.auth, permissionController.getAll)
 // curl -b "token=ba52ccff-ff97-4995-9366-0af0cbf97dcb" localhost:5000/api/v1/permissions; echo ""
-
+// create a user
+router.get('/users')
+//update a user
+router.put('/users/:id', auth.auth, userController.update)
+//delete a user
+router.delete('/users/:id', auth.auth, userController.delete)
+//get a user
+router.get('/users/:id', auth.auth, userController.fetch)
+//fetch all users
+router.get('/users', auth.auth, userController.getAll)
 export default router;
