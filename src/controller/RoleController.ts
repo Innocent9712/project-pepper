@@ -24,8 +24,8 @@ class RoleController extends BaseController {
 
   async createRole(req: Request, res: Response) {
     try {
-      const { username } = req.body;
-      if (username && await checkPermission(username)) {
+      const { uname } = req.body;
+      if (uname && await checkPermission(uname)) {
         const {name} = req.body
         console.log(name)
         if (name) {
@@ -55,9 +55,9 @@ class RoleController extends BaseController {
 
   async updateRole(req: Request, res: Response) {
     try {
-      const { username } = req.body;
+      const { uname } = req.body;
 
-      if (username && await checkPermission(username)) {
+      if (uname && await checkPermission(uname)) {
         const {roleID} = req.params
         if (roleID) {
           const role = await db.role.findUnique({
@@ -67,7 +67,7 @@ class RoleController extends BaseController {
           });
 
           if (role) {
-            if (username !== SUPERADMIN && this.authRoles.includes(role.name)) {
+            if (uname !== SUPERADMIN && this.authRoles.includes(role.name)) {
               return res.status(403).json({
                 message: "You don't have the right to update this role",
               });
@@ -109,9 +109,9 @@ class RoleController extends BaseController {
 
   async deleteRole(req: Request, res: Response) {
     try {
-      const { username } = req.body;
+      const { uname } = req.body;
 
-      if (username && await checkPermission(username)) {
+      if (uname && await checkPermission(uname)) {
         const {roleID} = req.params
         if (roleID) {
           const role = await db.role.findUnique({
@@ -121,7 +121,7 @@ class RoleController extends BaseController {
           });
 
           if (role) {
-            if (username !== SUPERADMIN && this.authRoles.includes(role.name)) {
+            if (uname !== SUPERADMIN && this.authRoles.includes(role.name)) {
               return res.status(403).json({
                 message: "You don't have the right to delete this role",
               });
@@ -169,9 +169,9 @@ class RoleController extends BaseController {
 
   async getRole(req: Request, res: Response) {
     try {
-      const { username } = req.body;
+      const { uname } = req.body;
 
-      if (username && await checkPermission(username)) {
+      if (uname && await checkPermission(uname)) {
         const {roleID} = req.params
         if (roleID) {
           const role = await db.role.findUnique({
@@ -210,9 +210,9 @@ class RoleController extends BaseController {
 
   async getRolePermissions(req: Request, res: Response) {
     try {
-      const { username } = req.body;
+      const { uname } = req.body;
 
-      if (username && await checkPermission(username)) {
+      if (uname && await checkPermission(uname)) {
         const {roleID} = req.params
         if (roleID) {
           const role = await db.role.findUnique({
@@ -261,9 +261,9 @@ class RoleController extends BaseController {
 
   async getAll(req: Request, res: Response) {
     try {
-      const { username } = req.body;
+      const { uname } = req.body;
 
-      if (username && await checkPermission(username)) {
+      if (uname && await checkPermission(uname)) {
         const roles: Role[] = await db.role.findMany();
         return res.status(200).json({
           message: "Roles fetched successfully",
@@ -285,9 +285,9 @@ class RoleController extends BaseController {
 
   async addPermission(req: Request, res: Response) {
     try {
-      const { username } = req.body;
+      const { uname } = req.body;
 
-      if (username && await checkPermission(username)) {
+      if (uname && await checkPermission(uname)) {
         const {roleID} = req.params
         const {permissionID} = req.query
         if (roleID && permissionID && typeof roleID === 'string' && typeof permissionID === 'string') {
@@ -297,7 +297,7 @@ class RoleController extends BaseController {
             },
           });
           if (role) {
-            if (username !== SUPERADMIN && role.name === SUPERADMIN) {
+            if (uname !== SUPERADMIN && role.name === SUPERADMIN) {
               return res.status(403).json({
                 message: "You don't have the right to add permission to this role",
               });
@@ -361,8 +361,8 @@ class RoleController extends BaseController {
 
   async removePermission(req: Request, res: Response) {
     try {
-      const {username} = req.body
-      if (username && await checkPermission(username)) {
+      const {uname} = req.body
+      if (uname && await checkPermission(uname)) {
         const {roleID} = req.params
         const {permissionID} = req.query
         if (roleID && permissionID && typeof roleID === "string" && typeof permissionID === "string") {
@@ -372,7 +372,7 @@ class RoleController extends BaseController {
             },
           });
           if (role) {
-            if (username !== SUPERADMIN && role.name === SUPERADMIN) {
+            if (uname !== SUPERADMIN && role.name === SUPERADMIN) {
               return res.status(403).json({
                 message: "You don't have the right to remove permission from this role",
               });

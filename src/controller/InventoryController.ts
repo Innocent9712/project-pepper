@@ -65,9 +65,9 @@ class InventoryController {
                       id: parseInt(itemID),
                     },
                     data: {
-                      name,
-                      description,
-                      quantity: parseInt(quantity),
+                      name: name ? name: item.name,
+                      description: description ? description: item.description,
+                      quantity: quantity ?  parseInt(quantity) : item.quantity,
                     },
                   });
 
