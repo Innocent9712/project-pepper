@@ -25,7 +25,6 @@ class Auth {
     async login(req: Request, res: Response) {
         try {
             const authHeader = req.headers.authorization;
-            console.log(authHeader)
 
             if (authHeader) {
                 const basicAuth = authHeader.split(' ')[1];
@@ -63,6 +62,7 @@ class Auth {
             const {token} = cookies
             if (token) {
                 await redisClient.del(token);
+                console.log(`logged out`);
                 res.status(200).clearCookie('token').send('Logged out');
             } else {
                 res.status(401).send('Unauthorized');

@@ -11,6 +11,7 @@ import { Request, Response, NextFunction } from "express";
 import { Role, RolePermissions, User } from "@prisma/client";
 import {BaseController, SUPERADMIN, ADMIN} from "./BaseController";
 import baseController from "./BaseController";
+import { rolePermissions } from "../../prisma/seed/data";
 
 
 async function checkPermission(username: string) {
@@ -210,6 +211,57 @@ class RoleController extends BaseController {
               message: "Role not found",
             });
           }
+        }
+      }
+      return res.status(403).json({
+        message: "You don't have the right to fetch a role",
+      });
+
+    } catch (err) {
+      return res.status(500).json({
+        message: "Something went wrong",
+        err,
+      });
+    }
+  }
+
+  async getRolePermissions(req: Request, res: Response) {
+    try {
+      const { username } = req.body;
+
+      if (username && await checkPermission(username)) {
+        const {roleID} = req.params
+        if (roleID) {
+          const role = await db.role.findUnique({
+              where: {
+                id: parseInt(roleID),
+              }
+          })
+
+          if (role) {
+            const rolePermissions = await db.role.findUnique({
+              where: {
+                id: parseInt(roleID), // Replace ROLE_ID with the ID of the role you want to fetch
+              },
+              include: {
+                permissions: {
+                  include: {
+                    permission: true,
+                  },
+                },
+              },
+            });
+            
+            return res.status(200).json({
+              message: "Role permissions fetched successfully",
+              rolePermissions,
+            });
+          }
+          } else {
+            return res.status(404).json({
+              message: "Role not found",
+            });
+
         }
       }
       return res.status(403).json({
