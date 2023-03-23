@@ -5,117 +5,329 @@
 // Method to reduce the count of an inventory item only if the user has the superadmin role or admin role or sales role
 
 import { db } from "../utils/db.server";
-import { Request, Response, NextFunction } from "express";
-
-interface CreateRequest extends Request {
-    name: string;
-}
+import { Request, Response } from "express";
 
 class InventoryController {
-  static async create(req: Request, res: Response) {
-    try {
-      const { name, username } = req.body;
-
-      const role = await db.role.findFirst({
-        where: {
-          id: user.roleID,
-        },
-      });
-
-      if (
-        role?.name === "superadmin" ||
-        role?.name === "admin" ||
-        role?.name === "inventory manager"
-      ) {
-        const inventory = await db.inventory.create({
-          data: {
-            name,
-            description,
-            price,
-            count,
-          },
-        });
-
-        return res.status(201).json({
-          message: "Inventory item created successfully",
-          inventory,
-        });
-      } else {
-        return res.status(401).json({
-          message: "You are not authorized to create an inventory item",
-        });
-      }
-    } catch (error) {
-      return res.status(500).json({
-        message: "Something went wrong",
-        error: error.message,
-      });
-    }
-  }
-
-  static async fetchAll(req: Request, res: Response) {
-    try {
-      const inventory = await db.inventory.findMany();
-
-      return res.status(200).json({
-        message: "Inventory items fetched successfully",
-        inventory,
-      });
-    } catch (error) {
-      return res.status(500).json({
-        message: "Something went wrong",
-        error: error.message,
-      });
-    }
-  }
-
-  static async update(req: Request, res: Response) {
-    try {
-      const { id } = req.params;
-      const { name, description, price, count } = req.body;
-      const user = req.user;
-
-      const role = await db.role.findFirst({
-        where: {
-          id: user.roleID,
-        },
-      });
-
-      if (
-        role?.name === "superadmin" ||
-        role?.name === "admin" ||
-        role?.name === "inventory manager"
-      ) {
-        const inventory = await db.inventory.update({
-          where: {
-            id,
-          },
-          data: {
-            name,
-            description,
-            price,
-            count,
-          },
-        });
-
-        return res.status(200).json({
-          message: "Inventory item updated successfully",
-          inventory,
-        });
-      } else {
-        return res.status(401).json({
-          message: "You are not authorized to update an inventory item",
-        });
-      }
-    } catch (error) {
-        return res.status(500).json({
-            message: "Something went wrong",
-            error: error.message,
-        });
+  async create(req: Request, res: Response) {
+    const { uname } = req.body;
+    if (uname) {
+      const user = await db.user.findUnique({ where: { username: uname } });
+      if (user) {
+        //const id = user.roleID;
+        const permission = await db.rolePermissions.findFirst({ where: {roleID: user.roleID, permissionID: 9}});
+        if (permission) {
+          try {
+            const { name, description, quantity } = req.body;
+            if (name && quantity) {
+              const newItem = await db.inventory.create({
+                data: {
+                  name: name,
+                  description: description,
+                  quantity: parseInt(quantity),
+                },
+              });
+              return res.status(201).json({
+                message: "Inventory item created successfully",
+                newItem,
+              });
+            } else {
+              console.log("Missing information");
+              res.status(400).send('Bad request');
+            }
+          } catch (err) {
+              console.error(err);
+              res.status(500).json({ error: 'Failed to create inventory item' });
+            }
+        } else {
+          console.log('You are not authorized to create an inventory item');
+          res.status(401).send('You are not authorized to create an inventory item');
         }
+      }
     }
-
   }
+
+  async updateItem(req: Request, res: Response) {
+    const { uname } = req.body;
+    if (uname) {
+      const user = await db.user.findUnique({ where: { username: uname } });
+      if (user) {
+        const permission = await db.rolePermissions.findFirst({ where: {roleID: user.roleID, permissionID: 11}});
+        if (permission) {
+          try {
+            const { itemID } = req.params;
+            if (itemID) {
+              const item = await db.inventory.findUnique({ where: { id: parseInt(itemID) } });
+              if (item) {
+                const { name, description, quantity } = req.body;
+                if (name || description ||quantity) {
+                  const inventory = await db.inventory.update({
+                    where: {
+                      id: parseInt(itemID),
+                    },
+                    data: {
+                      name: name ? name: item.name,
+                      description: description ? description: item.description,
+                      quantity: quantity ?  parseInt(quantity) : item.quantity,
+                    },
+                  });
+
+                  return res.status(200).json({
+                    message: "Inventory item updated successfully",
+                    inventory,
+                  });
+                } else {
+                  console.log("Missing information");
+                  res.status(400).send('Bad request')
+                }
+              } else {
+                return res.status(404).json({
+                  message: "Item not found",
+                });
+              }
+            } else {
+              return res.status(404).json({
+                message: "Specify item ID",
+              });
+            }
+          } catch (err) {
+              console.error(err);
+              res.status(500).json({ error: 'Failed to update inventory' });
+            }
+        } else {
+          console.log('You are not authorized to update inventory');
+          res.status(401).send('You are not authorized to update inventory');
+        }
+      }
+    }
+  }
+
+  async fetchInventory(req: Request, res: Response) {
+    const { uname } = req.body;
+    if (uname) {
+      const user = await db.user.findUnique({ where: { username: uname } });
+      if (user) {
+        const permission = await db.rolePermissions.findFirst({ where: {roleID: user.roleID, permissionID: 10}});
+        if (permission) {
+          try {
+            const inventory = await db.inventory.findMany();
+            if (inventory) {
+              return res.status(200).json({
+                message: "Inventory items fetched successfully",
+                inventory,
+              });
+            } else {
+              console.log("Empty Database");
+              res.status(404).send('Empty Database')
+            }
+          } catch (err) {
+              console.error(err);
+              res.status(500).json({ error: 'Failed to fetch inventory' });
+            }
+        } else {
+          console.log('You are not authorized to fetch inventory');
+          res.status(401).send('You are not authorized to fetch inventory');
+        }
+      }
+    }
+  }
+
+  async deleteItem(req: Request, res: Response) {
+    const { uname } = req.body;
+    if (uname) {
+      const user = await db.user.findUnique({ where: { username: uname } });
+      if (user) {
+        const permission = await db.rolePermissions.findFirst({ where: {roleID: user.roleID, permissionID: 12}});
+        if (permission) {
+          try {
+            const { itemID } = req.params;
+            if (itemID) {
+              const item = await db.inventory.findUnique({ where: { id: parseInt(itemID) } });
+              if (item) {
+                await db.inventory.delete({
+                  where: {
+                    id: parseInt(itemID),
+                  },
+                });
+                return res.status(200).json({
+                  message: "Item deleted successfully",
+                })
+              } else {
+                return res.status(404).json({
+                  message: "Item not found",
+                });
+              }
+            } else {
+              return res.status(404).json({
+                message: "Specify item ID",
+              });
+            }
+          } catch (err) {
+              console.error(err);
+              res.status(500).json({ error: 'Failed to delete item' });
+            }
+        } else {
+          console.log('You are not authorized to update inventory');
+          res.status(401).send('You are not authorized to update inventory');
+        }
+      }
+    }
+  }
+
+  async sellItem(req: Request, res: Response) {
+    const { uname } = req.body;
+    if (uname) {
+      const user = await db.user.findUnique({ where: { username: uname } });
+      if (user) {
+        const permission = await db.rolePermissions.findFirst({ where: {roleID: user.roleID, permissionID: 14}});
+        if (permission) {
+          try {
+            const { itemID } = req.params;
+            if (itemID) {
+              const { quantity } = req.body;
+              if (quantity) {
+                const item = await db.inventory.findUnique({ where: { id: parseInt(itemID) } });
+                if (item) {
+                  if (quantity <= item.quantity) {
+                    const count = item.quantity - quantity;
+
+                    const inventory = await db.inventory.update({
+                      where: {
+                        id: parseInt(itemID),
+                      },
+                      data: {
+                        quantity: count,
+                      },
+                    });
+    
+                    return res.status(200).json({
+                      message: "Inventory item sold successfully",
+                      inventory,
+                    });
+                  } else {
+                    console.log(`${quantity} is greater than what is available`);
+                    res.status(500).json({ error: `${quantity} is greater than what is available` });
+                  }
+                } else {
+                  return res.status(404).json({
+                    message: "Item not found",
+                  });
+                }
+                
+              } else {
+                console.log("Missing information");
+                res.status(400).send('Bad request')
+              }
+            } else {
+              return res.status(404).json({
+                message: "Specify item ID",
+              });
+            }
+          } catch (err) {
+              console.error(err);
+              res.status(500).json({ error: 'Failed to update inventory' });
+            }
+        } else {
+          console.log('You are not authorized to update inventory');
+          res.status(401).send('You are not authorized to update inventory');
+        }
+      }
+    }
+  }
+
+  async fetchItem(req: Request, res: Response) {
+    const { uname } = req.body;
+    if (uname) {
+      const user = await db.user.findUnique({ where: { username: uname } });
+      if (user) {
+        const permission = await db.rolePermissions.findFirst({ where: {roleID: user.roleID, permissionID: 10}});
+        if (permission) {
+          try {
+            const { itemID } = req.params;
+            if (itemID) {
+              const item = await db.inventory.findUnique({ where: { id: parseInt(itemID) } });
+              if (item) {
+                return res.status(200).json({
+                  message: "Inventory items fetched successfully",
+                  item,
+                });
+              } else {
+                return res.status(404).json({
+                  message: "Item not found",
+                });
+              }
+            } else {
+              return res.status(404).json({
+                message: "Specify item ID",
+              });
+            }
+          } catch (err) {
+              console.error(err);
+              res.status(500).json({ error: 'Failed to update inventory' });
+            }
+        } else {
+          console.log('You are not authorized to fetch inventory');
+          res.status(401).send('You are not authorized to fetch inventory');
+        }
+      }
+    }
+  }
+
+  async restockItem(req: Request, res: Response) {
+    const { uname } = req.body;
+    if (uname) {
+      const user = await db.user.findUnique({ where: { username: uname } });
+      if (user) {
+        const permission = await db.rolePermissions.findFirst({ where: {roleID: user.roleID, permissionID: 13}});
+        if (permission) {
+          try {
+            const { itemID } = req.params;
+            if (itemID) {
+              const { quantity } = req.body;
+              if (quantity) {
+                const item = await db.inventory.findUnique({ where: { id: parseInt(itemID) } });
+                if (item) {
+                  const count = item.quantity + parseInt(quantity);
+
+                  const inventory = await db.inventory.update({
+                    where: {
+                      id: parseInt(itemID),
+                    },
+                    data: {
+                      quantity: count,
+                    },
+                  });
+    
+                  return res.status(200).json({
+                    message: "Inventory item successfully restocked",
+                    inventory,
+                  });
+                } else {
+                  return res.status(404).json({
+                    message: "Item not found",
+                  });
+                }
+                
+              } else {
+                console.log("Missing information");
+                res.status(400).send('Bad request')
+              }
+            } else {
+              return res.status(404).json({
+                message: "Specify item ID",
+              });
+            }
+          } catch (err) {
+              console.error(err);
+              res.status(500).json({ error: 'Failed to update inventory' });
+            }
+        } else {
+          console.log('You are not authorized to update inventory');
+          res.status(401).send('You are not authorized to update inventory');
+        }
+      }
+    }
+  }
+}
 
 const inventoryController = new InventoryController();
 export default inventoryController;

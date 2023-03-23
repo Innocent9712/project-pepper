@@ -8,30 +8,13 @@
 // (Messing with the superadmin role is prohibitted)
 import { db } from "../utils/db.server";
 import { Request, Response, NextFunction } from "express";
+import { checkPermission } from "../utils/utilFunctions";
 import { Role, RolePermissions, User } from "@prisma/client";
 import {BaseController, SUPERADMIN, ADMIN} from "./BaseController";
 import baseController from "./BaseController";
 import { rolePermissions } from "../../prisma/seed/data";
 
 
-async function checkPermission(username: string) {
-  const user: User | null = await db.user.findUnique({
-    where: { username },
-  });
-
-  if (user) {
-    const userRole: Role | null = await db.role.findUnique({
-      where: { id: user.roleID }
-    })
-
-    if (userRole) {
-      if ([SUPERADMIN, ADMIN].includes(userRole.name)) {
-        return true
-      }
-    }
-  }
-  return false
-}
 class RoleController extends BaseController {
   // private authRoles = ['superadmin', 'admin']
   // private authRoles: string[]
@@ -41,8 +24,8 @@ class RoleController extends BaseController {
 
   async createRole(req: Request, res: Response) {
     try {
-      const { username } = req.body;
-      if (username && await checkPermission(username)) {
+      const { uname } = req.body;
+      if (uname && await checkPermission(uname)) {
         const {name} = req.body
         console.log(name)
         if (name) {
@@ -72,9 +55,9 @@ class RoleController extends BaseController {
 
   async updateRole(req: Request, res: Response) {
     try {
-      const { username } = req.body;
+      const { uname } = req.body;
 
-      if (username && await checkPermission(username)) {
+      if (uname && await checkPermission(uname)) {
         const {roleID} = req.params
         if (roleID) {
           const role = await db.role.findUnique({
@@ -84,7 +67,7 @@ class RoleController extends BaseController {
           });
 
           if (role) {
-            if (username !== SUPERADMIN && this.authRoles.includes(role.name)) {
+            if (uname !== SUPERADMIN && this.authRoles.includes(role.name)) {
               return res.status(403).json({
                 message: "You don't have the right to update this role",
               });
@@ -126,9 +109,9 @@ class RoleController extends BaseController {
 
   async deleteRole(req: Request, res: Response) {
     try {
-      const { username } = req.body;
+      const { uname } = req.body;
 
-      if (username && await checkPermission(username)) {
+      if (uname && await checkPermission(uname)) {
         const {roleID} = req.params
         if (roleID) {
           const role = await db.role.findUnique({
@@ -138,7 +121,7 @@ class RoleController extends BaseController {
           });
 
           if (role) {
-            if (username !== SUPERADMIN && this.authRoles.includes(role.name)) {
+            if (uname !== SUPERADMIN && this.authRoles.includes(role.name)) {
               return res.status(403).json({
                 message: "You don't have the right to delete this role",
               });
@@ -186,9 +169,9 @@ class RoleController extends BaseController {
 
   async getRole(req: Request, res: Response) {
     try {
-      const { username } = req.body;
+      const { uname } = req.body;
 
-      if (username && await checkPermission(username)) {
+      if (uname && await checkPermission(uname)) {
         const {roleID} = req.params
         if (roleID) {
           const role = await db.role.findUnique({
@@ -227,9 +210,9 @@ class RoleController extends BaseController {
 
   async getRolePermissions(req: Request, res: Response) {
     try {
-      const { username } = req.body;
+      const { uname } = req.body;
 
-      if (username && await checkPermission(username)) {
+      if (uname && await checkPermission(uname)) {
         const {roleID} = req.params
         if (roleID) {
           const role = await db.role.findUnique({
@@ -278,9 +261,9 @@ class RoleController extends BaseController {
 
   async getAll(req: Request, res: Response) {
     try {
-      const { username } = req.body;
+      const { uname } = req.body;
 
-      if (username && await checkPermission(username)) {
+      if (uname && await checkPermission(uname)) {
         const roles: Role[] = await db.role.findMany();
         return res.status(200).json({
           message: "Roles fetched successfully",
@@ -302,9 +285,9 @@ class RoleController extends BaseController {
 
   async addPermission(req: Request, res: Response) {
     try {
-      const { username } = req.body;
+      const { uname } = req.body;
 
-      if (username && await checkPermission(username)) {
+      if (uname && await checkPermission(uname)) {
         const {roleID} = req.params
         const {permissionID} = req.query
         if (roleID && permissionID && typeof roleID === 'string' && typeof permissionID === 'string') {
@@ -314,7 +297,7 @@ class RoleController extends BaseController {
             },
           });
           if (role) {
-            if (username !== SUPERADMIN && role.name === SUPERADMIN) {
+            if (uname !== SUPERADMIN && role.name === SUPERADMIN) {
               return res.status(403).json({
                 message: "You don't have the right to add permission to this role",
               });
@@ -378,8 +361,8 @@ class RoleController extends BaseController {
 
   async removePermission(req: Request, res: Response) {
     try {
-      const {username} = req.body
-      if (username && await checkPermission(username)) {
+      const {uname} = req.body
+      if (uname && await checkPermission(uname)) {
         const {roleID} = req.params
         const {permissionID} = req.query
         if (roleID && permissionID && typeof roleID === "string" && typeof permissionID === "string") {
@@ -389,7 +372,7 @@ class RoleController extends BaseController {
             },
           });
           if (role) {
-            if (username !== SUPERADMIN && role.name === SUPERADMIN) {
+            if (uname !== SUPERADMIN && role.name === SUPERADMIN) {
               return res.status(403).json({
                 message: "You don't have the right to remove permission from this role",
               });
