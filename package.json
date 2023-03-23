@@ -40,12 +40,14 @@
   },
   "scripts": {
     "test": "mocha",
-    "start-server": "nodemon ./src/server.ts",
+    "dev": "nodemon ./src/server.ts",
+    "build": "npx tsc",
+    "start": "nodemon ./dist/server.js",
     "lint": "eslint ./src/*/**.ts",
     "fix-lint": "eslint ./src/*/**.ts --fix"
   },
   "prisma": {
-    "seed": "ts-node ./prisma/seed/seed.ts"
+    "seed": "ts-node ./src/prisma/seed/seed.ts"
   },
   "repository": {
     "type": "git",

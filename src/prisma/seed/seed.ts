@@ -1,5 +1,5 @@
 // import { PrismaClient } from "@prisma/client";
-import { db } from "../../src/utils/db.server";
+import { db } from "../../utils/db.server";
 import { user, role, permissions } from "./data";
 
 // const prisma = new PrismaClient();
