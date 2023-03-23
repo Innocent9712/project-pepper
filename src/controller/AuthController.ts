@@ -68,7 +68,7 @@ class Auth {
                     // req.username = username;
                     const user = await db.user.findUnique({ where: { username } });
                     if (user) {
-                        req.body = {...req.body, username: username};
+                        req.body = {...req.body, uname: username};
                         // req.body.username = username
                         res.cookie('token', token)
                         next();

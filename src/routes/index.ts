@@ -83,10 +83,16 @@ router.post('/inventory/create', auth.auth, inventoryController.create)
 // Update an inventory item
 router.put('/inventory/:itemID', auth.auth, inventoryController.updateItem)
 
-// Delete an Item
+// Fetch an inventory item
+router.get('/inventory/:itemID', auth.auth, inventoryController.fetchItem)
+
+// Delete an inventory item
 router.delete('/inventory/:itemID', auth.auth, inventoryController.deleteItem)
 
-// Selling an inventory Item
-router.put('/inventory/sale/:itemID', auth.auth, inventoryController.sellItem)
+// Selling an inventory item
+router.put('/inventory/sales/:itemID', auth.auth, inventoryController.sellItem)
+
+// Restocking an inventory item
+router.put('/inventory/purchases/:itemID', auth.auth, inventoryController.restockItem)
 
 export default router;

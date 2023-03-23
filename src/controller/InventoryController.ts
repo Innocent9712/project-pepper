@@ -6,18 +6,12 @@
 
 import { db } from "../utils/db.server";
 import { Request, Response } from "express";
-// import { checkPermission } from "../utils/utilFunctions";
-// import {BaseController, SUPERADMIN, ADMIN} from "./BaseController";
-
-interface CreateRequest extends Request {
-    name: string;
-}
 
 class InventoryController {
   async create(req: Request, res: Response) {
-    const { username } = req.body;
-    if (username) {
-      const user = await db.user.findUnique({ where: { username } });
+    const { uname } = req.body;
+    if (uname) {
+      const user = await db.user.findUnique({ where: { username: uname } });
       if (user) {
         //const id = user.roleID;
         const permission = await db.rolePermissions.findFirst({ where: {roleID: user.roleID, permissionID: 9}});
@@ -29,7 +23,7 @@ class InventoryController {
                 data: {
                   name: name,
                   description: description,
-                  quantity: quantity,
+                  quantity: parseInt(quantity),
                 },
               });
               return res.status(201).json({
@@ -53,9 +47,9 @@ class InventoryController {
   }
 
   async updateItem(req: Request, res: Response) {
-    const { username } = req.body;
-    if (username) {
-      const user = await db.user.findUnique({ where: { username } });
+    const { uname } = req.body;
+    if (uname) {
+      const user = await db.user.findUnique({ where: { username: uname } });
       if (user) {
         const permission = await db.rolePermissions.findFirst({ where: {roleID: user.roleID, permissionID: 11}});
         if (permission) {
@@ -73,7 +67,7 @@ class InventoryController {
                     data: {
                       name,
                       description,
-                      quantity,
+                      quantity: parseInt(quantity),
                     },
                   });
 
@@ -90,6 +84,10 @@ class InventoryController {
                   message: "Item not found",
                 });
               }
+            } else {
+              return res.status(404).json({
+                message: "Specify item ID",
+              });
             }
           } catch (err) {
               console.error(err);
@@ -104,9 +102,9 @@ class InventoryController {
   }
 
   async fetchInventory(req: Request, res: Response) {
-    const { username } = req.body;
-    if (username) {
-      const user = await db.user.findUnique({ where: { username } });
+    const { uname } = req.body;
+    if (uname) {
+      const user = await db.user.findUnique({ where: { username: uname } });
       if (user) {
         const permission = await db.rolePermissions.findFirst({ where: {roleID: user.roleID, permissionID: 10}});
         if (permission) {
@@ -134,9 +132,9 @@ class InventoryController {
   }
 
   async deleteItem(req: Request, res: Response) {
-    const { username } = req.body;
-    if (username) {
-      const user = await db.user.findUnique({ where: { username } });
+    const { uname } = req.body;
+    if (uname) {
+      const user = await db.user.findUnique({ where: { username: uname } });
       if (user) {
         const permission = await db.rolePermissions.findFirst({ where: {roleID: user.roleID, permissionID: 12}});
         if (permission) {
@@ -160,7 +158,7 @@ class InventoryController {
               }
             } else {
               return res.status(404).json({
-                message: "Item not found",
+                message: "Specify item ID",
               });
             }
           } catch (err) {
@@ -176,11 +174,11 @@ class InventoryController {
   }
 
   async sellItem(req: Request, res: Response) {
-    const { username } = req.body;
-    if (username) {
-      const user = await db.user.findUnique({ where: { username } });
+    const { uname } = req.body;
+    if (uname) {
+      const user = await db.user.findUnique({ where: { username: uname } });
       if (user) {
-        const permission = await db.rolePermissions.findFirst({ where: {roleID: user.roleID, permissionID: 13 || 14}});
+        const permission = await db.rolePermissions.findFirst({ where: {roleID: user.roleID, permissionID: 14}});
         if (permission) {
           try {
             const { itemID } = req.params;
@@ -219,6 +217,104 @@ class InventoryController {
                 console.log("Missing information");
                 res.status(400).send('Bad request')
               }
+            } else {
+              return res.status(404).json({
+                message: "Specify item ID",
+              });
+            }
+          } catch (err) {
+              console.error(err);
+              res.status(500).json({ error: 'Failed to update inventory' });
+            }
+        } else {
+          console.log('You are not authorized to update inventory');
+          res.status(401).send('You are not authorized to update inventory');
+        }
+      }
+    }
+  }
+
+  async fetchItem(req: Request, res: Response) {
+    const { uname } = req.body;
+    if (uname) {
+      const user = await db.user.findUnique({ where: { username: uname } });
+      if (user) {
+        const permission = await db.rolePermissions.findFirst({ where: {roleID: user.roleID, permissionID: 10}});
+        if (permission) {
+          try {
+            const { itemID } = req.params;
+            if (itemID) {
+              const item = await db.inventory.findUnique({ where: { id: parseInt(itemID) } });
+              if (item) {
+                return res.status(200).json({
+                  message: "Inventory items fetched successfully",
+                  item,
+                });
+              } else {
+                return res.status(404).json({
+                  message: "Item not found",
+                });
+              }
+            } else {
+              return res.status(404).json({
+                message: "Specify item ID",
+              });
+            }
+          } catch (err) {
+              console.error(err);
+              res.status(500).json({ error: 'Failed to update inventory' });
+            }
+        } else {
+          console.log('You are not authorized to fetch inventory');
+          res.status(401).send('You are not authorized to fetch inventory');
+        }
+      }
+    }
+  }
+
+  async restockItem(req: Request, res: Response) {
+    const { uname } = req.body;
+    if (uname) {
+      const user = await db.user.findUnique({ where: { username: uname } });
+      if (user) {
+        const permission = await db.rolePermissions.findFirst({ where: {roleID: user.roleID, permissionID: 13}});
+        if (permission) {
+          try {
+            const { itemID } = req.params;
+            if (itemID) {
+              const { quantity } = req.body;
+              if (quantity) {
+                const item = await db.inventory.findUnique({ where: { id: parseInt(itemID) } });
+                if (item) {
+                  const count = item.quantity + parseInt(quantity);
+
+                  const inventory = await db.inventory.update({
+                    where: {
+                      id: parseInt(itemID),
+                    },
+                    data: {
+                      quantity: count,
+                    },
+                  });
+    
+                  return res.status(200).json({
+                    message: "Inventory item successfully restocked",
+                    inventory,
+                  });
+                } else {
+                  return res.status(404).json({
+                    message: "Item not found",
+                  });
+                }
+                
+              } else {
+                console.log("Missing information");
+                res.status(400).send('Bad request')
+              }
+            } else {
+              return res.status(404).json({
+                message: "Specify item ID",
+              });
             }
           } catch (err) {
               console.error(err);
