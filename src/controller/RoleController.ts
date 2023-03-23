@@ -12,7 +12,7 @@ import { checkPermission } from "../utils/utilFunctions";
 import { Role, RolePermissions, User } from "@prisma/client";
 import {BaseController, SUPERADMIN, ADMIN} from "./BaseController";
 import baseController from "./BaseController";
-import { rolePermissions } from "../../prisma/seed/data";
+import { rolePermissions } from "../prisma/seed/data";
 
 
 class RoleController extends BaseController {

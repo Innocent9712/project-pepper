@@ -3,7 +3,7 @@
 import { Request, Response, Express } from "express";
 import swaggerJsdoc from "swagger-jsdoc"
 import swaggerUi from "swagger-ui-express"
-import {version} from "../../package.json"
+// import {version} from "../../package.json"
 import { PORT } from "../server";
 
 
@@ -12,7 +12,7 @@ const options: swaggerJsdoc.Options = {
       openapi: "3.0.0",
       info: {
         title: "Pepper Inventory API",
-        version,
+        version: "1.0.0",
         description:
           "This is an Inventory API application made with Express and documented with Swagger",
     //     license: {
