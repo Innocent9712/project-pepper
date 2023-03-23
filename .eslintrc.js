@@ -6,7 +6,7 @@ module.exports = {
     },
     extends: [
       'airbnb-base',
-      'plugin:jest/all',
+      // 'plugin:jest/all',
     ],
     globals: {
       Atomics: 'readonly',
@@ -31,7 +31,7 @@ module.exports = {
     },
     overrides:[
       {
-        files: ['*.js'],
+        files: ['*.ts'],
         excludedFiles: 'babel.config.js',
       }
     ]
