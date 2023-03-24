@@ -64,6 +64,9 @@ class Pepper(cmd.Cmd):
         try:
             username = line.split(' ')[0]
             password = line.split(' ')[1]
+            if username is None or password is None:
+                print("Please provide a username and password")
+                return
             basicToken = base64.b64encode(f'{username}:{password}'.encode('utf-8')).decode('utf-8')
             response = requests.post(f'{API}/login', headers={'Authorization': f'Basic {basicToken}'})
             if response.status_code == 200:
@@ -90,12 +93,21 @@ class Pepper(cmd.Cmd):
     
     def do_create_user(self, line):
         """Command to create a user
-        Usage: create_user <username> <password>
+        Usage: create_user <username> <password> <email>
         """
         try:
             username = line.split(' ')[0]
             password = line.split(' ')[1]
-            response = requests.post(f'{API}/users', json={'username': username, 'password': password})
+            email    = line.split(' ')[2]
+            if username is None or password is None:
+                print("Please provide a username and password")
+                return
+            jsonBody = {}
+            jsonBody['username'] = username
+            jsonBody['password'] = password
+            if email is not None:
+                jsonBody['email'] = email
+            response = requests.post(f'{API}/users', json=jsonBody)
             if response.status_code == 201:
                 print(f"Successfully created user {username}!")
             else:
@@ -123,6 +135,9 @@ class Pepper(cmd.Cmd):
         """
         try:
             role_name = line.split(' ')[0]
+            if role_name is None:
+                print("Provide a role name")
+                return
             response = requests.post(f'{API}/roles', json={'name': role_name}, cookies={'token': self._token})
             if response.status_code == 201:
                 print(f"Successfully created role {role_name}!")
@@ -150,10 +165,13 @@ class Pepper(cmd.Cmd):
         Usage: get_role <role_id>
         """
         try:
-            role_name = line.split(' ')[0]
-            response = requests.get(f'{API}/roles/{role_name}', cookies={'token': self._token})
+            role_id = line.split(' ')[0]
+            if role_id is None:
+                print("Provide a role id")
+                return
+            response = requests.get(f'{API}/roles/{role_id}', cookies={'token': self._token})
             if response.status_code == 200:
-                print(f"Successfully retrieved role {role_name}!")
+                print(f"Successfully retrieved role {role_id}!")
                 print(response.json())
             else:
                 print("Failed to retrieve role :(")
@@ -165,10 +183,13 @@ class Pepper(cmd.Cmd):
         Usage: delete_role <role_id>
         """
         try:
-            role_name = line.split(' ')[0]
-            response = requests.delete(f'{API}/roles/{role_name}', cookies={'token': self._token})
+            role_id = line.split(' ')[0]
+            if role_id is None:
+                print("Provide a role id")
+                return
+            response = requests.delete(f'{API}/roles/{role_id}', cookies={'token': self._token})
             if response.status_code == 200:
-                print(f"Successfully deleted role {role_name}!")
+                print(f"Successfully deleted role {role_id}!")
             else:
                 print("Failed to delete role :(")
         except Exception as e:
@@ -181,6 +202,9 @@ class Pepper(cmd.Cmd):
         try:
             role_id = line.split(' ')[0]
             role_name = line.split(' ')[1]
+            if role_id is None or role_name is None:
+                print("Provide a role id and updated role name")
+                return
             response = requests.put(f'{API}/roles/{role_id}', cookies={'token': self._token}, json={'name': role_name})
             if response.status_code == 200:
                 print(f"Successfully updated role {role_id}")
@@ -209,6 +233,9 @@ class Pepper(cmd.Cmd):
         """
         try:
             role_id = line.split(' ')[0]
+            if role_id is None:
+                print("Provide a role id")
+                return
             response = requests.get(f'{API}/roles/{role_id}/permissions', cookies={'token': self._token})
             if response.status_code == 200:
                 print(response.json())
@@ -224,6 +251,9 @@ class Pepper(cmd.Cmd):
         try:
             role_id = line.split(' ')[0]
             permission_id = line.split(' ')[1]
+            if role_id is None or permission_id is None:
+                print("Provide a role id and permission id")
+                return
             response = requests.post(f'{API}/roles/{role_id}/add-permission?permissionID={permission_id}', cookies={'token': self._token})
             if response.status_code == 200:
                 print(response.json())
@@ -241,11 +271,150 @@ class Pepper(cmd.Cmd):
         try:
             role_id = line.split(' ')[0]
             permission_id = line.split(' ')[1]
+            if role_id is None or permission_id is None:
+                print("Please provide both role_id and permission_id")
+                return
             response = requests.delete(f'{API}/roles/{role_id}/remove-permission?permissionID={permission_id}', cookies={'token': self._token})
             if response.status_code == 200:
                 print(response.json())
             else:
                 print("Failed to remove permission from role", response)
+        except Exception as e:
+            print(e)
+    
+    def do_get_inventory(self, line):
+        """Fetch all inventory items
+        Usage: get_inventory
+        """
+        try:
+            response = requests.get(f'{API}/inventory', cookies={'token': self._token})
+            if response.status_code == 200:
+                print(response.json())
+            else:
+                print("Failed to retrieve inventory")
+        except Exception as e:
+            print(e)
+    
+    def do_create_inventory_item(self, line):
+        """Create an inventory item
+        Usage: create_inventory_item <name> <price> <description>
+        """
+        try:
+            name = line.split(' ')[0]
+            price = line.split(' ')[2]
+            description = line.split(' ')[1]
+            if name is None or price is None:
+                print("Please provide a name and price for the inventory item")
+                return
+            jsonBody = {}
+            jsonBody["name"] = name
+            jsonBody["price"] = price
+            if description is not None:
+                jsonBody["description"] = description
+            response = requests.post(f'{API}/inventory', cookies={'token': self._token}, json=jsonBody)
+            if response.status_code == 201:
+                print(response.json())
+            else:
+                print("Failed to create inventory item")
+        except Exception as e:
+            print(e)
+
+    def do_get_inventory_item(self, line):
+        """Fetch a single inventory item
+        Usage: get_inventory_item <id>
+        """
+        try:
+            id = line.split(' ')[0]
+            if id is None:
+                print("Provide an inventory id")
+                return
+            response = requests.get(f'{API}/inventory/{id}', cookies={'token': self._token})
+            if response.status_code == 200:
+                print(response.json())
+            else:
+                print("Failed to get inventory item")
+        except Exception as e:
+            print(e)
+
+    def do_update_inventory_item(self, line):
+        """Update an inventory item
+        Usage: update_inventory_item <id> <name> <description> <price>
+        any of the name, description and price values are optional
+        for fields that don't need to be updated, just type None
+        """
+        try:
+            id = line.split(' ')[0]
+            name = line.split(' ')[1]
+            description = line.split(' ')[2]
+            price = line.split(' ')[3]
+            jsonBody = {}
+            if id is None:
+                print("Please provide an inventory item id")
+                return
+            if name is not None:
+                jsonBody['name'] = name
+            if description is not None:
+                jsonBody['description'] = description
+            if price is not None:
+                jsonBody['price'] = price
+            response = requests.put(f'{API}/inventory/{id}', cookies={'token': self._token}, json=jsonBody)
+            if response.status_code == 200:
+                print(response.json())
+            else:
+                print("Failed to update inventory item")
+        except Exception as e:
+            print(e)
+    
+    def do_delete_inventory_item(self, line):
+        """Delete an inventory item
+        Usage: delete_inventory_item <id>
+        """
+        try:
+            id = line.split(' ')[0]
+            if id is None:
+                print("Please provide an inventory item id")
+                return
+            response = requests.delete(f'{API}/inventory/{id}', cookies={'token': self._token})
+            if response.status_code == 200:
+                print(response.json())
+            else:
+                print("Failed to delete inventory item")
+        except Exception as e:
+            print(e)
+
+    def do_sell_item(self, line):
+        """Sell from inventory
+        Usage: sell_item <id> <quantity>
+        """
+        try:
+            id = line.split(' ')[0]
+            quantity = line.split(' ')[1]
+            if id is None or quantity is None:
+                print("Provide the item id and quantity to sell")
+                return
+            response = requests.put(f'{API}/inventory/{id}/sell?quantity={quantity}', cookies={'token': self._token})
+            if response.status_code == 200:
+                print(response.json())
+            else:
+                print("Failed to sell item", response)
+        except Exception as e:
+            print(e)
+
+    def do_restock_item(self, line):
+        """Restock the quantity of an inventory item
+        Usage: restock_item <id> <quantity>
+        """
+        try:
+            id = line.split(' ')[0]
+            quantity = line.split(' ')[1]
+            if id is None or quantity is None:
+                print("Provide the item id and quantity to restock")
+                return
+            response = requests.put(f'{API}/inventory/{id}/restock?quantity={quantity}', cookies={'token': self._token})
+            if response.status_code == 200:
+                print(response.json())
+            else:
+                print("Failed to restock item")
         except Exception as e:
             print(e)
 
