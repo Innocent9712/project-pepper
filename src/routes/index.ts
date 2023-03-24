@@ -94,4 +94,7 @@ router.put('/inventory/sales/:itemID', auth.auth, inventoryController.sellItem)
 // Restocking an inventory item
 router.put('/inventory/restock/:itemID', auth.auth, inventoryController.restockItem)
 
+//create a user
+router.post('/users', auth.auth, userController.create)
+
 export default router;

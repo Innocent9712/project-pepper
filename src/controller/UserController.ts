@@ -6,6 +6,7 @@
 
 import { db } from "../utils/db.server";
 import { Request, Response, NextFunction } from "express";
+import { checkPermission } from "../utils/utilFunctions";
 import {BaseController, SUPERADMIN, ADMIN} from "./BaseController";
 import { User } from "@prisma/client";
 
@@ -15,46 +16,44 @@ class UserController extends BaseController {
   }
 
   async create(req: Request, res: Response) {
-    try {
-      const { super_admin_id, username, email, password, roleID } = req.body;
-
-      console.log(req.body);
-
-      // check if user is superadmin or admin
-      const user = await db.user.findUnique({
+    //check permissions
+    const {  email, username, password, role, roleID} = req.body;
+    const {uname} = req.body;
+    console.log(req.body)
+  
+    if (uname) {
+      //check if the user exists
+      const user = await db.user.findUnique({where: {username: uname}});
+      const permission = await db.rolePermissions.findFirst({ 
         where: {
-          id: parseInt(super_admin_id),
+          roleID: user?.roleID,
         }
       });
-      console.log(user)
-      // if user is not superadmin or admin, return 401
-      if (!user) { 
-        return res.status(401).json({ 
-          message: "You are not authorized to create a user" 
-        });
-      } else{
-        // if user is superadmin or admin, create a user
-        const user = await db.user.create({
-          data: {
-            // id: parseInt(super_admin_id),
-            email: email,
-            username: username,
-            password: password,
-            roleID: roleID,
-          },
-        }).then((response)=> {
+     
+      try {
+        if (user && permission) {
+          const newUser = await db.user.create({
+            data: {
+              email: email,
+              username: username,
+              password: password,
+              role: {
+                connect: {
+                  id: parseInt(roleID),
+                }
+              }
+            },
+          }).then((response) => {
+            let result = {
+              statusCode: 201,
+              success: true,
+              message: "User created successfully",
+              data: response,
+            }
 
-          let result = {
-            statusCode: 201,
-            success: true,
-            message: "User created successfully",
-            data: response,
-          }
-
-          return res.status(201).json(result);
-
-        });
-      }
+            return res.status(201).json(result);
+          });
+      };
     } catch (error:any) {
 
       let result = {
@@ -68,12 +67,14 @@ class UserController extends BaseController {
 
     }
   }
+}
   
-
+//fetch user details
   async fetch(req: Request, res: Response) {
     // fetch user details.
     try {
       const {id} = req.params;
+      
       //check if user is superadmin or admin
       const user = await db.user.findUnique({
         where: {
