@@ -71,11 +71,16 @@ router.delete('/roles/:roleID/remove-permission', auth.auth, roleController.remo
 router.get('/permissions', auth.auth, permissionController.getAll)
 // curl -b "token=ba52ccff-ff97-4995-9366-0af0cbf97dcb" localhost:5000/api/v1/permissions; echo ""
 // create a user
-router.get('/users')
+router.post('/createUsers', userController.create);
+//curl -b localhost:5000/api/v1/users; echo ""
+//fetch a user
+router.get('/user:id', auth.auth, userController.fetch)
+//curl -b localhost:5000/api/v1/users/:id; echo ""
 //update a user
-router.put('/users/:id', auth.auth, userController.update)
+router.put('/user/:id', auth.auth, userController.update)
+//curl -XPUT -b localhost:5000/api/v1/users/:id; echo ""
 //delete a user
-router.delete('/users/:id', auth.auth, userController.delete)
+router.delete('/user/:id', auth.auth, userController.delete)
 //get a user
 router.get('/users/:id', auth.auth, userController.fetch)
 //fetch all users

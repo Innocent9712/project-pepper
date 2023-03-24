@@ -16,16 +16,17 @@ class UserController extends BaseController {
 
   async create(req: Request, res: Response) {
     try {
-      const { name, username, email, password, roleID } = req.body;
+      const { super_admin_id, username, email, password, roleID } = req.body;
+
+      console.log(req.body);
+
       // check if user is superadmin or admin
       const user = await db.user.findUnique({
         where: {
-          id: req.body?.id,
-        },
-        include: {
-          role: true,
+          id: parseInt(super_admin_id),
         }
       });
+      console.log(user)
       // if user is not superadmin or admin, return 401
       if (!user) { 
         return res.status(401).json({ 
@@ -33,18 +34,38 @@ class UserController extends BaseController {
         });
       } else{
         // if user is superadmin or admin, create a user
-        const user= await db.user.create({
+        const user = await db.user.create({
           data: {
-            id: req.body?.id,
-            email: req.body?.email,
-            username,
-            password,
-            roleID,
+            // id: parseInt(super_admin_id),
+            email: email,
+            username: username,
+            password: password,
+            roleID: roleID,
           },
+        }).then((response)=> {
+
+          let result = {
+            statusCode: 201,
+            success: true,
+            message: "User created successfully",
+            data: response,
+          }
+
+          return res.status(201).json(result);
+
         });
       }
     } catch (error:any) {
-      return res.status(500).json({message: "Something went wrong", error: error.message});
+
+      let result = {
+        statusCode: 500,
+        message: "Something went wrong",
+        success: false,
+        error: error.message
+      };
+
+      return res.status(500).json(result);
+
     }
   }
   
@@ -52,37 +73,52 @@ class UserController extends BaseController {
   async fetch(req: Request, res: Response) {
     // fetch user details.
     try {
+      const {id} = req.params;
+      //check if user is superadmin or admin
       const user = await db.user.findUnique({
         where: {
-          id: req.body?.id,
+          id: parseInt(id),
+        }
+    })
+    if (!user) {
+      return res.status(401).json({
+        message: "You are not authorized to fetch user details"
+      })
+    } else {
+      // if user is superadmin or admin, fetch user details
+      const user = await db.user.findUnique({
+        where: {
+          id: parseInt(id),
         },
         include: {
           role: true,
+        },
+      }).then((response)=> {
+          let result = {
+            statusCode: 200,
+            success: true,
+            message: "User fetched successfully",
+            data: response,
+          }
+  
+          return res.status(200).json(result);
+  
         }
-      });
-
-      if (!user) {
-        return res.status(401).json({
-          message: "You are not authorized to fetch this user"
-        })
-      }
-      if (user.role.name !== 'admin' && user.role.name !== 'superadmin') {
-        return res.status(401).json({
-          message: "You are not allowed to fetch this user"
-        });
-      } else {
-        return res.status(200).json({
-          message: "User fetched successfully",
-          user,
-        });
-      }
-    } catch (error:any) {
-      return res.status(500).json({
-        message: "Something went wrong",
-        error: error.message,
-      });
+      );
     }
   }
+    catch (error:any) {
+      let result = {
+        statusCode: 500,
+        message: "Something went wrong",
+        success: false,
+        error: error.message
+      };
+  
+      return res.status(500).json(result);
+    }
+  }
+  
 
   async update(req: Request, res: Response) {
     try {
@@ -126,7 +162,7 @@ class UserController extends BaseController {
         } else {
           return res.status(401).json({
             message: "You are not authorized to update this user",
-          });
+          })
         }
     } catch (error:any) {
       return res.status(500).json({
