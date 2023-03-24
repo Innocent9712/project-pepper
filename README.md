@@ -16,7 +16,7 @@ where johndoe = username and randompassword = password
 
 if there are no migration files, run `npx prisma migrate dev` to create the migration files
 
-if there are migration files, run `npx prisma migrate up` to apply the migration files
+if there are migration files, run `npx prisma migrate deploy` to apply the migration files
 
 run `npx prisma db push` to create the tables
 and `npx prisma db seed` to seed the db with some data
@@ -45,4 +45,14 @@ visit http://localhost:5000/docs to see the documentation
 
 ## **For General Use**
 
-You can checkout the deployed 
+You can checkout the deployed API on [pepper.codekami.tech](pepper.codekami.tech)
+
+
+### Deploying in Production
+clone the codebase in a docker enabled environment.
+
+cd into the codebase root directory.
+
+run `docker-compose up -d` to start the server in production mode
+
+run `docker-compose down` to stop the server
