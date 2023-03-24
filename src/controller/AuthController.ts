@@ -1,31 +1,17 @@
-import { PassThrough } from "stream";
 import { db } from "../utils/db.server";
 import redisClient from "../utils/redis.server";
-// import { RedisClient} from "../utils/redis.server";
 import { Request, Response, NextFunction } from "express";
 import { v4 as uuidv4 } from "uuid";
+import { parseCookies } from "../utils/utilFunctions";
 
-// const redisClient = new RedisClient();
 
 interface AuthRequest extends Request {
     username?: string;
-}
-
-async function parseCookies(req: AuthRequest) {
-    const cookies: {[key: string]: string} = {};
-    if (req.headers.cookie) {
-        req.headers.cookie.split(';').forEach(cookie => {
-            const parts = cookie.split('=');
-            cookies[parts[0].trim()] = parts[1].trim();
-        });
-    }
-    return cookies;
 }
 class Auth {
     async login(req: Request, res: Response) {
         try {
             const authHeader = req.headers.authorization;
-            console.log(authHeader)
 
             if (authHeader) {
                 const basicAuth = authHeader.split(' ')[1];
@@ -43,7 +29,6 @@ class Auth {
                         console.log(`${username} logged in`);
                     } else {
                         console.log('Incorrect Password');
-                        console.log(decodedAuth)
                         res.status(401).send('Incorrect Password');
                     }
                 } else {
@@ -63,6 +48,7 @@ class Auth {
             const {token} = cookies
             if (token) {
                 await redisClient.del(token);
+                console.log(`logged out`);
                 res.status(200).clearCookie('token').send('Logged out');
             } else {
                 res.status(401).send('Unauthorized');
@@ -83,7 +69,8 @@ class Auth {
                     // req.username = username;
                     const user = await db.user.findUnique({ where: { username } });
                     if (user) {
-                        req.body.username = username
+                        req.body = {...req.body, uname: username};
+                        // req.body.username = username
                         res.cookie('token', token)
                         next();
                     }
