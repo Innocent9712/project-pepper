@@ -123,53 +123,52 @@ class UserController extends BaseController {
   async update(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const { name, email, username, password, roleID } = req.body;
-
-      const user = await db.user.findFirst({
+      const { email, username, password, roleID } = req.body;
+      //find user
+      const user = await db.user.findUnique({
         where: {
-          id: req.body?.id,
-        },
-      });
-
-      const role = await db.role.findFirst({
-        where: {
-          id: user?.roleID,
-        },
-      });
-
-      if (
-        role?.name === "superadmin" ||
-        role?.name === "admin" ||
-        req.body?.id === user?.id
-
-        ) {
-            await db.user.update({
-              where: {
-                id: req.body?.id,
-              },
-              data: {
-                username,
-                email,
-                password,
-                roleID,
-              },
-            });
-
-            return res.status(200).json({
-              message: "User updated successfully",
-              user,
-            });
-        } else {
-          return res.status(401).json({
-            message: "You are not authorized to update this user",
-          })
+          id: parseInt(id),
+        }, include: {
+          role: true,
         }
-    } catch (error:any) {
-      return res.status(500).json({
-        message: "Something went wrong",
-        error: error.message,
       });
-    }
+      if (!user) {
+        return res.status(401).json({
+          message: "You are not authorized to update user details"
+        })
+      } else {
+        //check if user is superadmin or admin
+        const user = await db.user.update({
+          where: {
+            id: parseInt(id),
+          },
+          data: {
+            email: email,
+            username: username,
+            password: password,
+            roleID: roleID,
+          },
+        }).then((response)=> {
+          let result = {
+            statusCode: 200,
+            success: true,
+            message: "User updated successfully",
+            data: response,
+          }
+          return res.status(200).json(result);
+        }
+        );
+      } 
+    } catch (error:any) {
+      let result = {
+        statusCode: 500,
+        message: "Something went wrong",
+        success: false,
+        error: error.message
+      };
+      return res.status(500).json(result);
+
+      };
   }
   async delete(req: Request, res: Response) {
     try {
