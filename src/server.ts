@@ -3,8 +3,8 @@ import router from './routes';
 import cors from 'cors'
 import swaggerDocs from './utils/swagger';
 
-//changed port to fit my system
-export const PORT = process.env.PORT || 3000;
+
+export const PORT = process.env.PORT || 5000;
 const app = express();
 app.use(express.json());
 app.use(cors())
