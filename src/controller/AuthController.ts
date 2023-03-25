@@ -18,7 +18,7 @@ class Auth {
                 const decodedAuth = Buffer.from(basicAuth, 'base64').toString("utf8");
                 const [username, password] = decodedAuth.split(':');
 
-                const user = await db.user.findUnique({ where: { username } });
+                const user = await db.user.findUnique({ where: { username } }) || await db.user.findUnique({ where: {email: username}});
           
                 if (user) {
                     const encodedpassword = Buffer.from(password, 'utf8').toString("base64");
