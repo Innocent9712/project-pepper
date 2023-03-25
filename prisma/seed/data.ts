@@ -86,6 +86,11 @@ export const permissions: Permission[] = [
         id: 14,
         name: "RemoveFromItem",
         description: "Remove quantity from item"
+    },
+    {
+        id: 15,
+        name: "ReadAllUsers",
+        description: "Get all user details"
     }
 ]
 
