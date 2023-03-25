@@ -95,6 +95,17 @@ router.put('/inventory/sales/:itemID', auth.auth, inventoryController.sellItem)
 router.put('/inventory/restock/:itemID', auth.auth, inventoryController.restockItem)
 
 //create a user
-router.post('/users', auth.auth, userController.create)
+router.post('/users', auth.auth, userController.create);
+
+//fetch user details
+router.get('/users/:userID', auth.auth, userController.fetchUser);
+
+//update user details
+router.put('/users/:userID', auth.auth, userController.updateUser);
+
+//delete user
+router.delete('/users/:userID', auth.auth, userController.deleteUser);
+
+//get all details
 
 export default router;
