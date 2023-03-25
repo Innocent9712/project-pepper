@@ -152,7 +152,7 @@ class UserController extends BaseController {
         
         where: {
           roleID: response.roleID,
-          permissionID: 3
+          permissionID: 15
         }
 
       }).then(async (response) => {

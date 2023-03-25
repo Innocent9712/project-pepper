@@ -106,7 +106,7 @@ router.put('/users/:userID', auth.auth, userController.updateUser);
 //delete user
 router.delete('/users/:userID', auth.auth, userController.deleteUser);
 
-//get all users
-
+//get all (users
+router.get('/users', auth.auth, userController.getAll);
 
 export default router;
