@@ -183,8 +183,8 @@ class InventoryController {
           try {
             const { itemID } = req.params;
             if (itemID) {
-              const { quantity } = req.body;
-              if (quantity) {
+              const quantity = parseInt(req.query.quantity as string, 10);
+              if (!isNaN(quantity)) {
                 const item = await db.inventory.findUnique({ where: { id: parseInt(itemID) } });
                 if (item) {
                   if (quantity <= item.quantity) {
@@ -282,11 +282,11 @@ class InventoryController {
           try {
             const { itemID } = req.params;
             if (itemID) {
-              const { quantity } = req.body;
-              if (quantity) {
+              const quantity = parseInt(req.query.quantity as string, 10);
+              if (!isNaN(quantity)) {
                 const item = await db.inventory.findUnique({ where: { id: parseInt(itemID) } });
                 if (item) {
-                  const count = item.quantity + parseInt(quantity);
+                  const count = item.quantity + quantity;
 
                   const inventory = await db.inventory.update({
                     where: {
