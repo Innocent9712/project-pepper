@@ -89,10 +89,10 @@ router.get('/inventory/:itemID', auth.auth, inventoryController.fetchItem)
 router.delete('/inventory/:itemID', auth.auth, inventoryController.deleteItem)
 
 // Selling an inventory item
-router.put('/inventory/:itemID/sell', auth.auth, inventoryController.sellItem)
+router.put('/inventory/sales/:itemID', auth.auth, inventoryController.sellItem)
 
 // Restocking an inventory item
-router.put('/inventory/:itemID/restock', auth.auth, inventoryController.restockItem)
+router.put('/inventory/restock/:itemID', auth.auth, inventoryController.restockItem)
 
 //create a user
 router.post('/users', auth.auth, userController.create);
@@ -106,6 +106,7 @@ router.put('/users/:userID', auth.auth, userController.updateUser);
 //delete user
 router.delete('/users/:userID', auth.auth, userController.deleteUser);
 
-//get all details
+//get all users
+
 
 export default router;
