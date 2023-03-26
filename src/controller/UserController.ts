@@ -19,7 +19,6 @@ class UserController extends BaseController {
     //check permissions
     const { email, username, password, role, roleID } = req.body;
     const { uname } = req.body;
-    console.log(req.body)
 
     const user = await db.user.findUnique({ where: { username: uname } });
     const permission = await db.rolePermissions.findFirst({
@@ -139,7 +138,7 @@ class UserController extends BaseController {
       const userData: Partial<User> = {}
       if (username) userData['username'] = username
       if (password) userData['password'] = Buffer.from(password, 'utf8').toString("base64")
-      if (roleID) userData['roleID'] = parseInt(roleID)
+      if (roleID && parseInt(userID) !== 1) userData['roleID'] = parseInt(roleID)
       if (email) userData['email'] = email
       try {
         await db.user.update({

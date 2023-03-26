@@ -91,39 +91,91 @@ class Pepper(cmd.Cmd):
         except Exception as e:
             print(e)
     
+    def do_get_users(self, line):
+        """Command to get all users
+        Usage: get_users
+        """
+        try:
+            response = requests.get(f'{API}/users', cookies={'token': self._token})
+            if response.status_code == 200:
+                print(f"Successfully retrieved users!")
+                print(response.json())
+            else:
+                print("Failed to retrieve users :(")
+        except Exception as e:
+            print(e)
+   
     def do_create_user(self, line):
         """Command to create a user
-        Usage: create_user <username> <password> <email>
+        Usage: create_user <username> <password> <roleID> <email>
         """
         try:
             username = line.split(' ')[0]
             password = line.split(' ')[1]
-            email    = line.split(' ')[2]
-            if username is None or password is None:
-                print("Please provide a username and password")
+            roleID   = line.split(' ')[2]
+            email    = line.split(' ')[3]
+            if username is None or password is None or roleID is None:
+                print("Please provide a username, password and roleID")
                 return
             jsonBody = {}
             jsonBody['username'] = username
             jsonBody['password'] = password
+            jsonBody['roleID'] = roleID
             if email is not None:
                 jsonBody['email'] = email
-            response = requests.post(f'{API}/users', json=jsonBody)
+            response = requests.post(f'{API}/users', json=jsonBody, cookies={'token': self._token})
             if response.status_code == 201:
                 print(f"Successfully created user {username}!")
             else:
                 print("Failed to create user :(")
         except Exception as e:
             print(e)
-    
-    def do_delete_user(self, line):
-        """Command to delete a user
-        Usage: delete_user <username>
+
+    def do_get_user(self, line):
+        """Command to get a user
+        Usage: get_user <username>
         """
         try:
-            username = line.split(' ')[0]
-            response = requests.delete(f'{API}/users/{username}', cookies={'token': self._token})
+            userID = line.split(' ')[0]
+            response = requests.get(f'{API}/users/{userID}', cookies={'token': self._token})
             if response.status_code == 200:
-                print(f"Successfully deleted user {username}!")
+                print(f"Successfully retrieved user {userID}!")
+                print(response.json())
+            else:
+                print("Failed to retrieve user :(")
+        except Exception as e:
+            print(e)
+
+    def do_update_user(self, line):
+        """Command to update a user
+        Usage: update_user <userID> username=<username> password=<password> roleID=<roleID> email=<email>
+        all values are optional but <userID> is required
+        """
+        try:
+            values=line.split(' ')
+            userID = values[0]
+            jsonBody = {}
+            for value in values:
+                if '=' in value:
+                    key, value = value.split('=')
+                    jsonBody[key] = value
+            response = requests.put(f'{API}/users/{userID}', json=jsonBody, cookies={'token': self._token})
+            if response.status_code == 200:
+                print(f"Successfully updated user {userID}!")
+            else:
+                print("Failed to update user :(")
+        except Exception as e:
+            print(e)
+
+    def do_delete_user(self, line):
+        """Command to delete a user
+        Usage: delete_user <userID>
+        """
+        try:
+            userID = line.split(' ')[0]
+            response = requests.delete(f'{API}/users/{userID}', cookies={'token': self._token})
+            if response.status_code == 200:
+                print(f"Successfully deleted user {userID}!")
             else:
                 print("Failed to delete user :(")
         except Exception as e:
