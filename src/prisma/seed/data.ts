@@ -1,4 +1,4 @@
-import {Role, User, Permission} from "@prisma/client";
+import {Role, User, Permission, RolePermissions} from "@prisma/client";
 
 const encodedpassword = Buffer.from('superadmin', 'utf8').toString("base64");
 
@@ -10,10 +10,25 @@ export const user: User = {
     roleID: 1
 }
 
-export const role: Role = {
-    id: 1,
-    name: 'superadmin'
-}
+export const roles: Role[] = [
+    {
+        id: 1,
+        name: 'superadmin'
+    },
+    {
+        id: 2,
+        name: "admin"
+    },
+    {
+        id: 3,
+        name: "manager"
+    },
+    {
+        id: 4,
+        name: "shopkeeper"
+    }
+
+]
 
 export const permissions: Permission[] = [
     {
@@ -86,11 +101,34 @@ export const permissions: Permission[] = [
         id: 14,
         name: "RemoveFromItem",
         description: "Remove quantity from item"
+    },
+    {
+        id: 15,
+        name: "ReadAllUsers",
+        description: "Get all user details"
     }
 ]
 
-export const rolePermissions = permissions.map((permission) => {
-    return {
-        
-    }
-})
+const superadminPermissions = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
+const adminPermissions = [1, 2, 3, 4, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
+const managerPermissions = [2, 6, 9, 10, 11, 12, 13, 15];
+const shopKeeperPermissions = [14]
+
+let rolePermissionIDCount = 1
+function buildRolePermissions(roleID: number, arr: number[]) {
+    return arr.map((permissionID: number) => {
+        return {
+            id: rolePermissionIDCount++,
+            roleID,
+            permissionID
+        }
+    })
+}
+
+const superadminRolePermissions = buildRolePermissions(1, superadminPermissions)
+const adminRolePermissions = buildRolePermissions(2, adminPermissions)
+const managerRolePermissions = buildRolePermissions(3, managerPermissions)
+const shopKeeperRolePermissions = buildRolePermissions(4, shopKeeperPermissions)
+
+export const rolePermissions: RolePermissions[] = [...superadminRolePermissions, ...adminRolePermissions, ...managerRolePermissions, ...shopKeeperRolePermissions]
+// console.log(rolePermissions)

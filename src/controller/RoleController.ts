@@ -8,29 +8,13 @@
 // (Messing with the superadmin role is prohibitted)
 import { db } from "../utils/db.server";
 import { Request, Response, NextFunction } from "express";
+import { checkPermission } from "../utils/utilFunctions";
 import { Role, RolePermissions, User } from "@prisma/client";
 import {BaseController, SUPERADMIN, ADMIN} from "./BaseController";
 import baseController from "./BaseController";
+import { rolePermissions } from "../prisma/seed/data";
 
 
-async function checkPermission(username: string) {
-  const user: User | null = await db.user.findUnique({
-    where: { username },
-  });
-
-  if (user) {
-    const userRole: Role | null = await db.role.findUnique({
-      where: { id: user.roleID }
-    })
-
-    if (userRole) {
-      if ([SUPERADMIN, ADMIN].includes(userRole.name)) {
-        return true
-      }
-    }
-  }
-  return false
-}
 class RoleController extends BaseController {
   // private authRoles = ['superadmin', 'admin']
   // private authRoles: string[]
@@ -40,8 +24,10 @@ class RoleController extends BaseController {
 
   async createRole(req: Request, res: Response) {
     try {
-      const { username } = req.body;
-      if (username && await checkPermission(username)) {
+      const { uname } = req.body;
+      const user = await db.user.findUnique({ where: { username: uname } });
+      const permission = await db.rolePermissions.findFirst({where: {roleID: user?.roleID, permissionID: 5}})
+      if (permission) {
         const {name} = req.body
         console.log(name)
         if (name) {
@@ -71,9 +57,10 @@ class RoleController extends BaseController {
 
   async updateRole(req: Request, res: Response) {
     try {
-      const { username } = req.body;
-
-      if (username && await checkPermission(username)) {
+      const { uname } = req.body;
+      const user = await db.user.findUnique({ where: { username: uname } });
+      const permission = await db.rolePermissions.findFirst({where: {roleID: user?.roleID, permissionID: 7}})
+      if (permission) {
         const {roleID} = req.params
         if (roleID) {
           const role = await db.role.findUnique({
@@ -83,11 +70,6 @@ class RoleController extends BaseController {
           });
 
           if (role) {
-            if (username !== SUPERADMIN && this.authRoles.includes(role.name)) {
-              return res.status(403).json({
-                message: "You don't have the right to update this role",
-              });
-            }
             const {name} = req.body
             if (name) {
               const role = await db.role.update({
@@ -125,9 +107,10 @@ class RoleController extends BaseController {
 
   async deleteRole(req: Request, res: Response) {
     try {
-      const { username } = req.body;
-
-      if (username && await checkPermission(username)) {
+      const { uname } = req.body;
+      const user = await db.user.findUnique({ where: { username: uname } });
+      const permission = await db.rolePermissions.findFirst({where: {roleID: user?.roleID, permissionID: 8}})
+      if (permission) {
         const {roleID} = req.params
         if (roleID) {
           const role = await db.role.findUnique({
@@ -137,11 +120,6 @@ class RoleController extends BaseController {
           });
 
           if (role) {
-            if (username !== SUPERADMIN && this.authRoles.includes(role.name)) {
-              return res.status(403).json({
-                message: "You don't have the right to delete this role",
-              });
-            }
             const rolePermissions = await db.rolePermissions.findMany({
               where: {
                 roleID: parseInt(roleID),
@@ -185,9 +163,10 @@ class RoleController extends BaseController {
 
   async getRole(req: Request, res: Response) {
     try {
-      const { username } = req.body;
-
-      if (username && await checkPermission(username)) {
+      const { uname } = req.body;
+      const user = await db.user.findUnique({ where: { username: uname } });
+      const permission = await db.rolePermissions.findFirst({where: {roleID: user?.roleID, permissionID: 6}})
+      if (permission) {
         const {roleID} = req.params
         if (roleID) {
           const role = await db.role.findUnique({
@@ -196,11 +175,6 @@ class RoleController extends BaseController {
             },
           });
           if(role) {
-            // if (username !== SUPERADMIN && role.name === SUPERADMIN) {
-            //   return res.status(403).json({
-            //     message: "You don't have the right to fetch a role",
-            //   });
-            // }
             return res.status(200).json({
               message: "Role fetched successfully",
               role,
@@ -224,11 +198,64 @@ class RoleController extends BaseController {
     }
   }
 
+  async getRolePermissions(req: Request, res: Response) {
+    try {
+      const { uname } = req.body;
+      const user = await db.user.findUnique({ where: { username: uname } });
+      const permission = await db.rolePermissions.findFirst({where: {roleID: user?.roleID, permissionID: 6}})
+      if (permission) {
+        const {roleID} = req.params
+        if (roleID) {
+          const role = await db.role.findUnique({
+              where: {
+                id: parseInt(roleID),
+              }
+          })
+
+          if (role) {
+            const rolePermissions = await db.role.findUnique({
+              where: {
+                id: parseInt(roleID), // Replace ROLE_ID with the ID of the role you want to fetch
+              },
+              include: {
+                permissions: {
+                  include: {
+                    permission: true,
+                  },
+                },
+              },
+            });
+            
+            return res.status(200).json({
+              message: "Role permissions fetched successfully",
+              rolePermissions,
+            });
+          }
+          } else {
+            return res.status(404).json({
+              message: "Role not found",
+            });
+
+        }
+      }
+      return res.status(403).json({
+        message: "You don't have the right to fetch a role",
+      });
+
+    } catch (err) {
+      return res.status(500).json({
+        message: "Something went wrong",
+        err,
+      });
+    }
+  }
+
   async getAll(req: Request, res: Response) {
     try {
-      const { username } = req.body;
-
-      if (username && await checkPermission(username)) {
+      const { uname } = req.body;
+      const user = await db.user.findUnique({ where: { username: uname } });
+      const permission = await db.rolePermissions.findFirst({where: {roleID: user?.roleID, permissionID: 6}})
+      if (permission) {
         const roles: Role[] = await db.role.findMany();
         return res.status(200).json({
           message: "Roles fetched successfully",
@@ -250,23 +277,24 @@ class RoleController extends BaseController {
 
   async addPermission(req: Request, res: Response) {
     try {
-      const { username } = req.body;
-
-      if (username && await checkPermission(username)) {
+      const { uname } = req.body;
+      const user = await db.user.findUnique({ where: { username: uname } });
+      const userPermission = await db.rolePermissions.findFirst({where: {roleID: user?.roleID, permissionID: 7}})
+      if (userPermission) {
         const {roleID} = req.params
         const {permissionID} = req.query
         if (roleID && permissionID && typeof roleID === 'string' && typeof permissionID === 'string') {
+          if (parseInt(roleID) === 1) {
+            return res.status(403).json({
+              message: "You don't have the right to add permission to this role",
+            });
+          }
           const role = await db.role.findUnique({
             where: {
               id: parseInt(roleID),
             },
           });
           if (role) {
-            if (username !== SUPERADMIN && role.name === SUPERADMIN) {
-              return res.status(403).json({
-                message: "You don't have the right to add permission to this role",
-              });
-            }
             const permission = await db.permission.findUnique({
               where: {
                 id: parseInt(permissionID),
@@ -326,18 +354,25 @@ class RoleController extends BaseController {
 
   async removePermission(req: Request, res: Response) {
     try {
-      const {username} = req.body
-      if (username && await checkPermission(username)) {
+      const {uname} = req.body
+      const user = await db.user.findUnique({ where: { username: uname } });
+      const userPermission = await db.rolePermissions.findFirst({where: {roleID: user?.roleID, permissionID: 7}})
+      if (userPermission) {
         const {roleID} = req.params
         const {permissionID} = req.query
         if (roleID && permissionID && typeof roleID === "string" && typeof permissionID === "string") {
+          if (parseInt(roleID) === 1) {
+            return res.status(403).json({
+              message: "You don't have the right to remove permission from this role",
+            });
+          }
           const role = await db.role.findUnique({
             where: {
               id: parseInt(roleID),
             },
           });
           if (role) {
-            if (username !== SUPERADMIN && role.name === SUPERADMIN) {
+            if (uname !== SUPERADMIN && role.name === SUPERADMIN) {
               return res.status(403).json({
                 message: "You don't have the right to remove permission from this role",
               });
