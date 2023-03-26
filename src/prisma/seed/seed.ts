@@ -1,27 +1,27 @@
 // import { PrismaClient } from "@prisma/client";
 import { db } from "../../utils/db.server";
-import { user, role, permissions } from "./data";
+import { user, roles, rolePermissions, permissions } from "./data";
 
 // const prisma = new PrismaClient();
 
 
 async function seed() {
-    await db.role.create({
-        data: role
-    });
-
     for (const permission of permissions) {
         await db.permission.create({
             data: permission
         });
+    }
 
+    for (const role of roles) {
+        await db.role.create({
+            data: role
+        });
+    }
+
+    for (const rolePermission of rolePermissions) {
         await db.rolePermissions.create({
-            data: {
-                id: permission.id,
-                roleID: role.id,
-                permissionID: permission.id
-            }
-        })
+            data: rolePermission
+        });
     }
 
     await db.user.create({

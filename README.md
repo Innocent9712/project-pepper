@@ -17,7 +17,7 @@ if there are no migration files, run `npx prisma migrate dev` to create the migr
 
 if there are migration files, run `npx prisma migrate deploy` to apply the migration files
 
-run `npx prisma db push` to create the tables
+run `npx prisma db push` to create the tables (run with the `--schema <schema location>` flag is prisma directory is not in root directory)
 and `npx prisma db seed` to seed the db with some data
 
 run `npm run dev` to start the server in dev mode
