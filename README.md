@@ -53,6 +53,8 @@ clone the codebase in a docker enabled environment.
 
 cd into the codebase root directory.
 
+copy **.env.prod.example** to **.env.prod** and make necessary changes to the placeholder values
+
 run `docker compose --env-file .env.prod up -d` to start the server in production mode
 
 run `docker-compose --env-file .env.prod down` to stop the server
