@@ -1,9 +1,18 @@
 # Use an official Node.js runtime as a parent image
-FROM node:14-alpine
+FROM ubuntu:22.04
 
+RUN apt-get update && apt-get install curl -y
+RUN curl -fsSL https://deb.nodesource.com/setup_19.x | bash - &&\
+apt-get install -y nodejs
 # Set the working directory to /app
 WORKDIR /app
 
+# Define environment variables
+ARG DB_HOST
+ARG DB_PORT
+ARG DB_NAME
+ARG DB_USERNAME
+ARG DB_PASSWORD
 
 # Copy the .env.template file
 COPY .env.example .env
@@ -16,29 +25,18 @@ RUN sed -i "s|johndoe|${DB_USERNAME}|" .env && \
     sed -i "s|pepper|${DB_NAME}|" .env
 
 # Install dependencies
-COPY package*.json ./
+COPY package*.json tsconfig.json ./
 RUN npm install
-
+#RUN npm install prisma --save-dev
 
 # Copy the rest of the application files
-COPY src .
-
-# Build the Prisma client
-RUN npx prisma generate
-
-# Push migration to DB
-RUN npx prisma migrate deploy
-
-# Seed db with necessary data
-RUN npm run seed
-
-# Build the prod code
-RUN npm run build
+COPY . .
 
 # Make port available to the world outside this container
 ENV PORT=5000
+ENV REDIS_URL=redis://redis:6379
 EXPOSE $PORT
 
+RUN npm run build
 
-# Define the command to run the server
-CMD ["npm", "start"]
+CMD npx prisma migrate deploy --schema ./src/prisma/schema.prisma && npx prisma generate --schema=./src/prisma/schema.prisma && npm run start

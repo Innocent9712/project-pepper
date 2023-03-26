@@ -69,44 +69,43 @@ router.delete('/roles/:roleID/remove-permission', auth.auth, roleController.remo
 router.get('/permissions', auth.auth, permissionController.getAll);
 // curl -b "token=ba52ccff-ff97-4995-9366-0af0cbf97dcb" localhost:5000/api/v1/permissions; echo ""
 
-
 // Endpoints to manage inventory
 
 // Get all inventory items
-router.get('/inventory', auth.auth, inventoryController.fetchInventory)
+router.get('/inventory', auth.auth, inventoryController.fetchInventory);
 
 // Create new inventory item
-router.post('/inventory/create', auth.auth, inventoryController.create)
+router.post('/inventory/create', auth.auth, inventoryController.create);
 // curl -XPOST -b "token=779af205-ad78-4fe3-bc98-b6841d02e837" localhost:5000/api/v1/inventory/create -H 'Content-Type: application/json' -d '{"name": "sample", "description": "A sample product", "quantity": 10}'; echo ""
 
 // Update an inventory item
-router.put('/inventory/:itemID', auth.auth, inventoryController.updateItem)
+router.put('/inventory/:itemID', auth.auth, inventoryController.updateItem);
 
 // Fetch an inventory item
-router.get('/inventory/:itemID', auth.auth, inventoryController.fetchItem)
+router.get('/inventory/:itemID', auth.auth, inventoryController.fetchItem);
 
 // Delete an inventory item
-router.delete('/inventory/:itemID', auth.auth, inventoryController.deleteItem)
+router.delete('/inventory/:itemID', auth.auth, inventoryController.deleteItem);
 
 // Selling an inventory item
-router.put('/inventory/sales/:itemID', auth.auth, inventoryController.sellItem)
+router.put('/inventory/sales/:itemID', auth.auth, inventoryController.sellItem);
 
 // Restocking an inventory item
-router.put('/inventory/restock/:itemID', auth.auth, inventoryController.restockItem)
+router.put('/inventory/restock/:itemID', auth.auth, inventoryController.restockItem);
 
-//create a user
+// create a user
 router.post('/users', auth.auth, userController.create);
 
-//fetch user details
+// fetch user details
 router.get('/users/:userID', auth.auth, userController.fetchUser);
 
-//update user details
+// update user details
 router.put('/users/:userID', auth.auth, userController.updateUser);
 
-//delete user
+// delete user
 router.delete('/users/:userID', auth.auth, userController.deleteUser);
 
-//get all (users
+// get all (users
 router.get('/users', auth.auth, userController.getAll);
 
 export default router;

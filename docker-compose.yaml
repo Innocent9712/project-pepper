@@ -1,12 +1,10 @@
 version: "3"
-env_file:
-  - .env.prod
 services:
   db:
     image: mysql:8
     restart: always
-    # env_file:
-    #   - .env.prod
+    env_file:
+      - .env.prod
     environment:
       MYSQL_DATABASE: ${DB_NAME}
       MYSQL_USER: ${DB_USERNAME}
@@ -14,19 +12,33 @@ services:
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
     volumes:
       - db-data:/var/lib/mysql
+  redis:
+    image: redis:latest
+    restart: always
+    env_file:
+      - .env.prod
+    environment:
+      ALLOW_EMPTY_PASSWORD: yes
+    ports:
+      - 8081:6379
   app:
-    build: .
+    restart: on-failure
+    build:
+      context: .
+      args:
+        DB_HOST: ${DB_HOST}
+        DB_PORT: ${DB_PORT}
+        DB_NAME: ${DB_NAME}
+        DB_USERNAME: ${DB_USERNAME}
+        DB_PASSWORD: ${DB_PASSWORD}
     ports:
       - 80:${APP_PORT}
-    # env_file:
-    #   - .env.prod
+    env_file:
+      - .env.prod
     environment:
-      DB_HOST: ${DB_HOST}
-      DB_PORT: ${DB_PORT}
-      DB_NAME: ${DB_NAME}
-      DB_USERNAME: ${DB_USERNAME}
-      DB_PASSWORD: ${DB_PASSWORD}
+      REDIS_URL: redis://redis:${REDIS_PORT}
     depends_on:
       - db
+      - redis
 volumes:
   db-data:
