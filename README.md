@@ -1,12 +1,11 @@
 # project-pepper
-We'll get back to this
 
 ## **For Devs**
 run npm install
 
 Make sure mysql is installed locally or remotely on port 3306 and you have a user login credential.
 
-Then create db if it doesn't exist yest by running
+Then create db if it doesn't exist yet by running
 ./createdb.sh -h <mysql_host> -u <mysql_user> --password <mysql_password>
 
 from the root of the project
@@ -37,7 +36,8 @@ then run `source venv/bin/activate` to activate the virtual environment
 
 then run `pip install -r requirements.txt` to install the dependencies
 
-then run `python console.py` to start the console
+then run `python console.py` to start the console for local API server
+or `API=<API url> PORT=<port> python console.py` to start the console for remote API server
 
 ### Docs
 
@@ -53,6 +53,12 @@ clone the codebase in a docker enabled environment.
 
 cd into the codebase root directory.
 
-run `docker-compose up -d` to start the server in production mode
+run `docker compose --env-file .env.prod up -d` to start the server in production mode
 
-run `docker-compose down` to stop the server
+run `docker-compose --env-file .env.prod down` to stop the server
+
+run `docker-compose --env-file.env.prod logs -f` to see the logs of the server
+
+run `docker exec -it  project-pepper-app-1 npx prisma db seed` to seed the db with some required data
+
+And you're all set to go. Your deployed API can now be accessed at `http://<host>/api/v1`
