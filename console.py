@@ -349,25 +349,25 @@ class Pepper(cmd.Cmd):
     
     def do_create_inventory_item(self, line):
         """Create an inventory item
-        Usage: create_inventory_item <name> <price> <description>
+        Usage: create_inventory_item <name> <quantity> <description>
         """
         try:
             name = line.split(' ')[0]
-            price = line.split(' ')[2]
-            description = line.split(' ')[1]
-            if name is None or price is None:
-                print("Please provide a name and price for the inventory item")
+            quantity = line.split(' ')[1]
+            description = line.split(' ')[2]
+            if name is None or quantity is None:
+                print("Please provide a name and quantity for the inventory item")
                 return
             jsonBody = {}
             jsonBody["name"] = name
-            jsonBody["price"] = price
+            jsonBody["quantity"] = quantity
             if description is not None:
                 jsonBody["description"] = description
-            response = requests.post(f'{API}/inventory', cookies={'token': self._token}, json=jsonBody)
+            response = requests.post(f'{API}/inventory/create', cookies={'token': self._token}, json=jsonBody)
             if response.status_code == 201:
                 print(response.json())
             else:
-                print("Failed to create inventory item")
+                print("Failed to create inventory item", response)
         except Exception as e:
             print(e)
 
@@ -390,15 +390,15 @@ class Pepper(cmd.Cmd):
 
     def do_update_inventory_item(self, line):
         """Update an inventory item
-        Usage: update_inventory_item <id> <name> <description> <price>
-        any of the name, description and price values are optional
+        Usage: update_inventory_item <id> <name> <description> <quantity>
+        any of the name, description and quantity values are optional
         for fields that don't need to be updated, just type None
         """
         try:
             id = line.split(' ')[0]
             name = line.split(' ')[1]
             description = line.split(' ')[2]
-            price = line.split(' ')[3]
+            quantity = line.split(' ')[3]
             jsonBody = {}
             if id is None:
                 print("Please provide an inventory item id")
@@ -407,8 +407,8 @@ class Pepper(cmd.Cmd):
                 jsonBody['name'] = name
             if description is not None:
                 jsonBody['description'] = description
-            if price is not None:
-                jsonBody['price'] = price
+            if quantity is not None:
+                jsonBody['quantity'] = quantity
             response = requests.put(f'{API}/inventory/{id}', cookies={'token': self._token}, json=jsonBody)
             if response.status_code == 200:
                 print(response.json())
