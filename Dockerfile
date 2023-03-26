@@ -37,6 +37,4 @@ ENV PORT=5000
 ENV REDIS_URL=redis://redis:6379
 EXPOSE $PORT
 
-RUN npm run build
-
-CMD npx prisma migrate deploy --schema ./src/prisma/schema.prisma && npx prisma generate --schema=./src/prisma/schema.prisma && npm run start
+CMD npx prisma migrate deploy --schema ./src/prisma/schema.prisma && npx prisma generate --schema=./src/prisma/schema.prisma && npm run build &&  npm run start
