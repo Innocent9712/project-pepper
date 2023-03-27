@@ -41,7 +41,7 @@ or `API=<API url> PORT=<port> python console.py` to start the console for remote
 
 ### Docs
 
-visit http://localhost:5000/docs to see the documentation
+visit [here](https://documenter.getpostman.com/view/21791381/2s93RQRtZS) to see the documentation
 
 ## **For General Use**
 
