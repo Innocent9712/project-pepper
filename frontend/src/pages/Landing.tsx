@@ -1,12 +1,11 @@
-import React from 'react';
 import inventory from "../assets/inventory.jpg"
 import landingBg from "../assets/landing-bg.jpg"
+import { loginStore } from '../store';
 
-interface LandingPageProps {
-  isLoggedIn: boolean;
-}
+const LandingPage = () => {
+  const isLoggedIn = loginStore((state) => state.login)
+  console.log(isLoggedIn)
 
-const LandingPage: React.FC<LandingPageProps> = ({ isLoggedIn }) => {
   return (
     <div className="bg-gray-100 min-h-screen">
       <nav className="bg-white shadow">

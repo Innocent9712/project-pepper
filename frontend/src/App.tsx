@@ -5,15 +5,17 @@ import LandingPage from './pages/Landing'
 import Layout from './components/Layout'
 import Dashboard from './pages/Dashboard'
 import Login, {action as LoginAction } from './pages/Login'
+import { loginStore } from './store'
+import { shallow } from 'zustand/shallow'
 
 
 
 function App() {
-  const [loggedIn, setLoggedIn] = useState(false)
+  // const [login] = loginStore((state) => [state.login], shallow)
   
   const router = createBrowserRouter(createRoutesFromElements(
     <>
-      <Route path="/" element={<LandingPage isLoggedIn={loggedIn} />} />
+      <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<Login />} action={LoginAction} />
       <Route path="/" element={<Layout />}>
         <Route path='dashboard' element={<Dashboard />} />
