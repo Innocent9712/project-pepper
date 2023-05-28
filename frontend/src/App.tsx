@@ -3,6 +3,7 @@ import LandingPage from './pages/Landing'
 import Layout from './components/Layout'
 import Dashboard from './pages/Dashboard'
 import Login, {action as LoginAction } from './pages/Login'
+import Inventory, {loader as InventoryLoader} from './pages/Inventory'
 
 
 function App() {  
@@ -12,6 +13,7 @@ function App() {
       <Route path="/login" element={<Login />} action={LoginAction} />
       <Route path="/" element={<Layout />}>
         <Route path='dashboard' element={<Dashboard />} />
+        <Route path='inventory' element={<Inventory />} loader={InventoryLoader} />
       </Route>
     </>
   ))

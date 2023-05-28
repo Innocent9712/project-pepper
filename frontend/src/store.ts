@@ -4,13 +4,17 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 
 interface LoginState {
   login: boolean;
+  session: string;
   setLogin: (newState: boolean) => void;
+  setSession: (value: string) => void;
 }
 
 
 export const loginStore = create(persist<LoginState>((set) => ({
     login: false,
-    setLogin: (newState: boolean) => set({ login: newState})
+    session: "",
+    setLogin: (newState: boolean) => set({ login: newState}),
+    setSession: (value: string) => set({session: value})
 }),
     {
         name: "login",

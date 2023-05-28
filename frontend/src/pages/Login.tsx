@@ -4,14 +4,16 @@ import { login } from '../api';
 import { redirect } from 'react-router-dom';
 
 
+
 export async function action({ request }: { request: Request }): Promise<string | Response> {
   const formData = await request.formData();
   const username = formData.get("username");
   const password = formData.get("password");
   const credentials = btoa(`${username}:${password}`);
+  
   try {
     const user_session = await login(credentials);
-    // sessionStorage.setItem("user_session", JSON.stringify(user_session))
+    sessionStorage.setItem("session", JSON.stringify(user_session))
     console.log(user_session)
     if (user_session) return redirect("/dashboard?login=success");
     throw new Error("Login Failed")

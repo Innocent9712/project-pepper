@@ -1,3 +1,5 @@
+const session = sessionStorage.getItem('session');
+
 export async function login(bearer: string) {
     console.log(bearer)
     try {
@@ -13,8 +15,9 @@ export async function login(bearer: string) {
   
       if (response.ok) {
         // Request successful, return true
-        console.log(response);
-        return true;
+        const data = await response.json()
+        console.log(data);
+        return data.session_token;
       } else {
         // Request failed, return false
         return null;
@@ -24,4 +27,29 @@ export async function login(bearer: string) {
       throw error;
     }
   }
+  
+
+  export async function getAllInventory() {
+    const bearer = `Bearer ${session}`.replace(/['"]+/g, '')
+    try {
+      const response = await fetch(`${import.meta.env.VITE_APP_API_ENDPOINT}/inventory`, {
+        headers: {
+          Authorization: bearer,
+        },
+      });
+  
+      if (response.ok) {
+        // Request successful, return the JSON data
+        const data = await response.json();
+        // console.log(data);
+        return data;
+      } else {
+        // Request failed, return null
+        return null;
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+  
   
