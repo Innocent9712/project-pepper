@@ -1,4 +1,3 @@
-import React from 'react'
 import { authSession } from '../utils'
 import { loginStore } from '../store'
 
@@ -7,7 +6,7 @@ export async function loader() {
     if (user_session) return user_session
     return null
 }
-  
+
 
 const Dashboard = () => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -15,6 +14,7 @@ const Dashboard = () => {
     const login = urlParams.get('login');
     console.log(login)
     if (login) setLogin(true)
+    console.log(import.meta.env.VITE_APP_API_ENDPOINT)
 
   return (
     <section className='text-gray-900 mt-8 pl-4'>

@@ -1,18 +1,11 @@
-import { useState } from 'react'
-// import './App.css'
 import { Route, RouterProvider, createBrowserRouter, createRoutesFromElements } from 'react-router-dom'
 import LandingPage from './pages/Landing'
 import Layout from './components/Layout'
 import Dashboard from './pages/Dashboard'
 import Login, {action as LoginAction } from './pages/Login'
-import { loginStore } from './store'
-import { shallow } from 'zustand/shallow'
 
 
-
-function App() {
-  // const [login] = loginStore((state) => [state.login], shallow)
-  
+function App() {  
   const router = createBrowserRouter(createRoutesFromElements(
     <>
       <Route path="/" element={<LandingPage />} />

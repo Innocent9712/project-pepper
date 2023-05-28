@@ -11,10 +11,10 @@ export async function action({ request }: { request: Request }): Promise<string 
   const credentials = btoa(`${username}:${password}`);
   try {
     const user_session = await login(credentials);
-    sessionStorage.setItem("user_session", JSON.stringify(user_session))
+    // sessionStorage.setItem("user_session", JSON.stringify(user_session))
     console.log(user_session)
-
-    return redirect("/dashboard?login=success");
+    if (user_session) return redirect("/dashboard?login=success");
+    throw new Error("Login Failed")
   } catch (err: any) {
     return err.message;
   }
@@ -34,6 +34,7 @@ const Login: React.FC = () => {
           <input
             type="text"
             id="username"
+            name="username"
             className="w-full border border-gray-700 rounded px-3 py-2 focus:outline-none focus:border-blue-500 bg-gray-100 text-black"
             required
           />
@@ -43,6 +44,7 @@ const Login: React.FC = () => {
           <input
             type="password"
             id="password"
+            name="password"
             className="w-full border border-gray-700 rounded px-3 py-2 focus:outline-none focus:border-blue-500 bg-gray-100 text-black"
             required
           />
