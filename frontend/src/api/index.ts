@@ -1,8 +1,11 @@
+import { InventoryItem } from "../typings";
+
 const session = sessionStorage.getItem('session');
+const bearer = `Bearer ${session}`.replace(/['"]+/g, '')
+
 
 export async function login(bearer: string) {
   try {
-    alert(import.meta.env.VITE_APP_API_ENDPOINT)
     const response = await fetch(`${import.meta.env.VITE_APP_API_ENDPOINT}/login`, {
       method: 'POST',
       headers: {
@@ -50,10 +53,9 @@ export async function logout() {
     throw error;
   }
 }
-  
+
 
 export async function getAllInventory() {
-  const bearer = `Bearer ${session}`.replace(/['"]+/g, '')
   try {
     const response = await fetch(`${import.meta.env.VITE_APP_API_ENDPOINT}/inventory`, {
       headers: {
@@ -61,6 +63,36 @@ export async function getAllInventory() {
       },
     });
 
+    if (response.ok) {
+      // Request successful, return the JSON data
+      const data = await response.json();
+      // console.log(data);
+      return data;
+    } else {
+      // Request failed, return null
+      return null;
+    }
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function addInventoryItem(item: InventoryItem) {
+  try {
+    console.log(item)
+    const response = await fetch(`${import.meta.env.VITE_APP_API_ENDPOINT}/inventory/create`, {
+      method: 'POST',
+      body: JSON.stringify({
+        "name": item.name,
+        "description": item.description,
+        "quantity": item.quantity
+      }),
+      headers: {
+        Authorization: bearer,
+        "Content-Type": "application/json",
+      },
+    });
+      console.log(response);
     if (response.ok) {
       // Request successful, return the JSON data
       const data = await response.json();

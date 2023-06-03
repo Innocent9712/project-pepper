@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { getAllInventory } from '../api';
 import { useLoaderData } from 'react-router';
 
@@ -40,11 +41,13 @@ const { inventory } = useLoaderData() as LoaderDataInterface;
     <section className="mt-8 px-4">
       <div className='flex justify-between items-center mb-8'>
         <h2 className='text-xl text-gray-700 font-bold'>Inventory</h2>
-        <button className=''>Add new item</button>
+        <Link to="new">
+          <button className=''>Add new item</button>
+        </Link>
 
       </div>
-      <div className="overflow-x-auto w-[90vw]">
-        <ul className="flex flex-col gap-6 min-w-[800px] min-h-[600px] bg-gray-300 text-gray-800 p-8">
+      <div className="overflow-x-auto">
+        <ul className="flex flex-col gap-6 min-w-[500px] min-h-[600px] bg-gray-300 text-gray-800 p-8">
           {inventory.map((item: any) => (
             <li key={item.id} className="flex-shrink-0 flex items-center gap-8">
               <span>{item.name} - Quantity: {item.quantity}</span>

@@ -16,8 +16,8 @@ const Layout = () => {
     <div>
       <Header toggleSidebar={toggleSidebar} toggle={isSidebarOpen} />
       <div className='flex min-h-screen'>
-        <div className='hidden md:block w-[10%]'>
-          <div className=" bg-gray-200 h-screen">
+        <div className='hidden md:block'>
+          <div className=" bg-gray-200 h-screen md:w-[10%] lg:w-60">
             <ul className="py-4">
               <li className="px-4 py-2 text-gray-700 hover:text-gray-500">
                 <Link to="/dashboard">Dashboard</Link>
@@ -34,7 +34,7 @@ const Layout = () => {
             </ul>
           </div>
         </div>
-        <main className="flex-grow bg-gray-100">
+        <main className="flex-grow w-full bg-gray-100">
           <Outlet />
         </main>
       </div>
