@@ -25,7 +25,7 @@ class Auth {
                     if (user.password === encodedpassword) {
                         const token = uuidv4();
                         await redisClient.set(token, username, 60 * 60 * 24);
-                        res.status(200).cookie('token', token).send(`${username} logged in`);
+                        res.status(200).cookie('token', token).json({session_token: token});
                         console.log(`${username} logged in`);
                     } else {
                         console.log('Incorrect Password');
@@ -46,8 +46,19 @@ class Auth {
         try {
             const cookies = await parseCookies(req);
             const {token} = cookies
-            if (token) {
-                await redisClient.del(token);
+
+            let bearer
+            
+            const authHeader = req.headers['authorization'];
+            
+            if (authHeader && authHeader.startsWith('Bearer ')) {
+              bearer = authHeader.split(' ')[1];
+            }
+            
+            const tokenValue = token || bearer
+
+            if (tokenValue) {
+                await redisClient.del(tokenValue);
                 console.log(`logged out`);
                 res.status(200).clearCookie('token').send('Logged out');
             } else {
@@ -63,15 +74,25 @@ class Auth {
         try {
             const cookies = await parseCookies(req);
             const {token} = cookies
-            if (token) {
-                const username = await redisClient.get(token);
+            let bearer
+            
+            const authHeader = req.headers['authorization'];
+            
+            if (authHeader && authHeader.startsWith('Bearer ')) {
+              bearer = authHeader.split(' ')[1];
+            }
+            
+            const tokenValue = token || bearer
+            
+            if (tokenValue) {
+                const username = await redisClient.get(tokenValue);
                 if (username) {
                     // req.username = username;
                     const user = await db.user.findUnique({ where: { username } });
                     if (user) {
                         req.body = {...req.body, uname: username};
                         // req.body.username = username
-                        res.cookie('token', token)
+                        res.cookie('token', tokenValue)
                         next();
                     }
                 } else {

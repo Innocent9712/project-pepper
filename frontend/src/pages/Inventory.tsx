@@ -37,8 +37,12 @@ const { inventory } = useLoaderData() as LoaderDataInterface;
   };
 
   return (
-    <section className="mt-8 pl-4">
-      <h2 className='text-xl text-gray-700 font-bold mb-8'>Inventory</h2>
+    <section className="mt-8 px-4">
+      <div className='flex justify-between items-center mb-8'>
+        <h2 className='text-xl text-gray-700 font-bold'>Inventory</h2>
+        <button className=''>Add new item</button>
+
+      </div>
       <div className="overflow-x-auto w-[90vw]">
         <ul className="flex flex-col gap-6 min-w-[800px] min-h-[600px] bg-gray-300 text-gray-800 p-8">
           {inventory.map((item: any) => (

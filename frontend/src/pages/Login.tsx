@@ -15,9 +15,11 @@ export async function action({ request }: { request: Request }): Promise<string 
     const user_session = await login(credentials);
     sessionStorage.setItem("session", JSON.stringify(user_session))
     console.log(user_session)
+    alert(user_session)
     if (user_session) return redirect("/dashboard?login=success");
     throw new Error("Login Failed")
   } catch (err: any) {
+    alert(err)
     return err.message;
   }
 }

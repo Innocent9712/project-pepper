@@ -1,10 +1,18 @@
+import { logout } from "../api";
 import inventory from "../assets/inventory.jpg"
 import landingBg from "../assets/landing-bg.jpg"
 import { loginStore } from '../store';
 
 const LandingPage = () => {
   const isLoggedIn = loginStore((state) => state.login)
-  console.log(isLoggedIn)
+  // console.log(isLoggedIn)
+  const handleLogout = async () => {
+    const res = await logout()
+    if (res) {
+      sessionStorage.removeItem('session')
+      loginStore.setState({ login: false })
+    }
+  }
 
   return (
     <div className="bg-gray-100 min-h-screen">
@@ -22,9 +30,14 @@ const LandingPage = () => {
                   </li>
                 )}
                 {isLoggedIn && (
-                  <li>
-                    <a href="/dashboard" className="text-gray-600 hover:text-gray-800">Dashboard</a>
-                  </li>
+                  <div className="flex items-center gap-2">
+                    <li>
+                      <a href="/dashboard" className="text-gray-600 hover:text-gray-800">Dashboard</a>
+                    </li>
+                    <li>
+                      <button className="py-1" onClick={handleLogout}>logout</button>
+                    </li>
+                  </div>
                 )}
               </ul>
             </div>

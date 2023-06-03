@@ -1,9 +1,12 @@
 import { useState } from 'react';
-import { Outlet, Link } from 'react-router-dom';
+import { Outlet, Link, Navigate } from 'react-router-dom';
 import Header from './Header';
 
 const Layout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const session = sessionStorage.getItem('session');
+  if (!session) return <Navigate to="/login" />
+
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
