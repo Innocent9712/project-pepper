@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { getAllInventory } from '../api';
 import { useLoaderData } from 'react-router';
+import { PopOverOne } from '../components/PopOver';
 
 interface InventoryItemInterface {
     id: number;
@@ -52,7 +53,10 @@ const { inventory } = useLoaderData() as LoaderDataInterface;
             <li key={item.id} className="flex-shrink-0 flex items-center gap-8">
               <span>{item.name} - Quantity: {item.quantity}</span>
               <button onClick={() => handleTakeOut(item.id)} className='text-white bg-blue-600' >Take Out</button>
-              <button onClick={() => handleRestock(item.id)} className='text-white bg-green-500' >Restock</button>
+              <div className='relative'>
+                <button onClick={() => handleRestock(item.id)} className='text-white bg-green-500' >Restock</button>
+                <PopOverOne />
+              </div>
               <button onClick={() => handleDeleteInventory(item.id)} className='text-white bg-red-500' >Delete Inventory</button>
             </li>
           ))}

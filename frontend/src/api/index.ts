@@ -15,7 +15,6 @@ export async function login(bearer: string) {
       // Add body data if needed
       // body: JSON.stringify(data),
     });
-    alert(`resp:" ${response}`)
 
     if (response.ok) {
       // Request successful, return true

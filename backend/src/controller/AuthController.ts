@@ -3,6 +3,7 @@ import redisClient from "../utils/redis.server";
 import { Request, Response, NextFunction } from "express";
 import { v4 as uuidv4 } from "uuid";
 import { parseCookies } from "../utils/utilFunctions";
+import opentelemetry from '@opentelemetry/api';
 
 
 interface AuthRequest extends Request {
@@ -71,6 +72,7 @@ class Auth {
     }
 
     async auth(req: AuthRequest, res: Response, next: NextFunction) {
+        let activeSpan = opentelemetry.trace.getActiveSpan();
         try {
             const cookies = await parseCookies(req);
             const {token} = cookies
@@ -89,7 +91,10 @@ class Auth {
                 if (username) {
                     // req.username = username;
                     const user = await db.user.findUnique({ where: { username } });
+                    
                     if (user) {
+                        activeSpan?.setAttribute("user.id", user.id);
+                        activeSpan?.setAttribute("user.name", username);
                         req.body = {...req.body, uname: username};
                         // req.body.username = username
                         res.cookie('token', tokenValue)

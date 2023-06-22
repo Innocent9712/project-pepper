@@ -2,6 +2,7 @@ import React from 'react'
 import { Form, redirect } from 'react-router-dom'
 import { addInventoryItem } from '../api';
 import { InventoryItem } from '../typings';
+import { PopOverOne, PopOverTwo } from '../components/PopOver';
 
 export async function action({ request }: { request: Request }): Promise<string | Response> {
     const formData = await request.formData();
@@ -71,7 +72,8 @@ const AddInventory = () => {
                     done
                 </button>
             </div>
-
+            <PopOverOne />
+            <PopOverTwo />
         </Form>
     </section>
   )
