@@ -31,3 +31,13 @@ else
   # Seed the database with the specified schema
   npx prisma db seed --preview-feature --schema ./src/prisma/schema.prisma
 fi
+
+# Build Codebase
+if [ ! -d "dist" ]; then
+  # Run command when 'dist' directory doesn't exist
+  echo "Build directory not found. Running the build command..."
+  npm run build
+else
+  # Run command when 'dist' directory exists
+  echo "Build directory found. Skipping build command..."
+fi
