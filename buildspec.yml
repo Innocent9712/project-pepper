@@ -6,9 +6,14 @@ phases:
     commands:
       - cd frontend
       - npm install
+      - cd backend
+      - npm install
   build:
     commands:
-      - echo echo $PWD
+      - echo $PWD
+      - cd frontend
+      - npm run build
+      - cd backend
       - npm run build
   post_build:
     commands:
@@ -20,6 +25,7 @@ phases:
 artifacts:
   files:
     - frontend/dist/**/*/
+    - backend/dist/**/*/
   discard-paths: no
 
 
