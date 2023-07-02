@@ -1,9 +1,10 @@
-import React, {useState} from 'react';
+// import  {useState} from 'react';
 
 const BubbleContainer = ({ render, display }: any) => {
-    const [show, setShow] = useState(display)
+    // const [show, setShow] = useState(display)
+    
   return (
-    <div className={`${!show && "hidden"} absolute min-w-[180px] top-14`}>
+    <div className={`${!display && "hidden"} absolute min-w-[180px] top-14`}>
         <div className="bg-white rounded-lg p-4 shadow-lg">
             {render()}
         </div>
@@ -16,7 +17,7 @@ const BubbleContainer = ({ render, display }: any) => {
 export default BubbleContainer;
 
 
-export function PopOverOne({ action, value, onChange, display }: any)  {
+export function PopOverOne({ value, onChange, display }: any)  {
   return (
     <BubbleContainer display={display} render={() => (
         <>
@@ -40,7 +41,7 @@ export function PopOverOne({ action, value, onChange, display }: any)  {
   )
 }
 
-export function PopOverTwo({ action}: any) {
+export function PopOverTwo() {
     return (
         <BubbleContainer render={()=> (
             <>
