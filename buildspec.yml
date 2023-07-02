@@ -8,6 +8,7 @@ phases:
       - npm install
   build:
     commands:
+      - echo echo $PWD
       - npm run build
   post_build:
     commands:
@@ -19,7 +20,6 @@ phases:
 artifacts:
   files:
     - frontend/dist/**/*/
-    - codebackend/**/*
   discard-paths: no
 
 
