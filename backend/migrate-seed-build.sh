@@ -26,10 +26,10 @@ if [[ $hasMigrations ]]; then
   echo "Database is already up to date. Skipping migration."
 else
   # Run the migrations with the specified schema
-  npx prisma migrate deploy --preview-feature --skip-generate --schema ./src/prisma/schema.prisma
+  npx prisma migrate deploy --schema ./src/prisma/schema.prisma
 
   # Seed the database with the specified schema
-  npx prisma db seed --preview-feature --schema ./src/prisma/schema.prisma
+  npx prisma db seed --schema ./src/prisma/schema.prisma
 fi
 
 # Build Codebase
