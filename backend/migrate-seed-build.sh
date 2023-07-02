@@ -20,7 +20,7 @@ export DATABASE_URL
 npx prisma generate --schema ./src/prisma/schema.prisma
 
 # Check if the database needs to be migrated
-hasMigrations=$(npx prisma db push --preview-feature 2>&1 | grep "Database is already up to date.")
+hasMigrations=$(npx prisma db push --preview-feature --schema ./src/prisma/schema.prisma 2>&1 | grep "The database is already in sync with the Prisma schema.")
 
 if [[ $hasMigrations ]]; then
   echo "Database is already up to date. Skipping migration."
