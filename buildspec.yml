@@ -1,0 +1,29 @@
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+      nodejs: 18
+    commands:
+      - cd frontend
+      - npm install
+      - cd ../backend
+      - npm install
+  build:
+    commands:
+      - echo $PWD
+      - ./migrate-seed-build.sh $DATABASE_URL
+      - cd ../frontend
+      - npm run build
+      
+  post_build:
+    commands:
+    # - cd ../frontend 
+      - echo "Uploading to S3.."
+      - aws s3 cp dist s3://react-test-12311 --recursive
+      - echo "Done."
+
+artifacts:
+  files:
+    - frontend/dist/**/*/
+    - backend/dist/**/*/
+  discard-paths: no
