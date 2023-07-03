@@ -1,13 +1,20 @@
 import { Form, redirect } from 'react-router-dom'
 import { addInventoryItem } from '../api';
-import { InventoryItem } from '../typings';
+// import { InventoryItem } from '../typings';
 import { PopOverOne, PopOverTwo } from '../components/PopOver';
+
+export type InventoryItem = {
+    name: string,
+    description: string,
+    quantity: number
+}
 
 export async function action({ request }: { request: Request }): Promise<string | Response> {
     const formData = await request.formData();
     const name = formData.get("name") as string;
     const description = formData.get("description") as string;
     const quantity = parseInt(formData.get("quantity") as string);
+
 
     const data: InventoryItem = {
         name,

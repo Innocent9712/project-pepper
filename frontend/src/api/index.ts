@@ -1,4 +1,5 @@
-import { InventoryItem } from "../typings";
+// import { InventoryItem } from "../typings";
+import { InventoryItem } from "../pages/AddInventory";
 
 const session = sessionStorage.getItem('session');
 const bearer = `Bearer ${session}`.replace(/['"]+/g, '')
