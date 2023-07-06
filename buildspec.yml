@@ -24,7 +24,7 @@ phases:
 
 artifacts:
   files:
-    # - appspec.yml
+    - appspec.yml
     - frontend/dist/**/*/
     - backend/dist/**/*/
   discard-paths: no
