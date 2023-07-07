@@ -14,7 +14,10 @@ phases:
       - ./migrate-seed-build.sh $DATABASE_URL
       - cd ../frontend
       - npm run build
-      
+      - echo $HONEYCOMB_API_KEY >> env
+      - echo $OTEL_SERVICE_NAME >> env
+      - echo $DATABASE_URL >> env
+      - echo $REDIS_URL >> env
   post_build:
     commands:
     # - cd ../frontend 
@@ -25,6 +28,7 @@ phases:
 artifacts:
   files:
     - appspec.yml
+    - scripts/*
     - frontend/dist/**/*/
     - backend/dist/**/*/
   discard-paths: no

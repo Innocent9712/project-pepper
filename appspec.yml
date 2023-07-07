@@ -3,3 +3,12 @@ os: linux
 files:
   - source: /
     destination: /var/www/html
+hooks:
+  BeforeInstall:
+    - location: scripts/install_node.sh
+      timeout: 300
+      runas: ubuntu
+#  AfterInstall:
+#    - location: scripts/start_backend.sh
+#      timeout: 300
+ #     runas: ubuntu
