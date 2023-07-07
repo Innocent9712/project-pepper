@@ -8,7 +8,7 @@ directory="/var/www/html/"
 if [ -z "$(ls -A "$directory")" ]; then
     echo "Directory is empty"
 else
-   rm -rf "$directory"/*
+   sudo rm -rf "$directory"/*
    echo "Directory is not empty"
 fi
 
