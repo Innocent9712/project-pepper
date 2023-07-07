@@ -12,4 +12,4 @@ else
    echo "Directory is not empty"
 fi
 
-sudo cp project-pepper.service /etc/systemd/system/
+# sudo cp project-pepper.service /etc/systemd/system/
