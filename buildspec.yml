@@ -5,7 +5,6 @@ phases:
       nodejs: 18
     commands:
       - mkdir code
-      - cp -r backend code
       - touch env
       - echo HONEYCOMB_API_KEY=$HONEYCOMB_API_KEY >> env
       - echo OTEL_SERVICE_NAME=$OTEL_SERVICE_NAME >> env
@@ -19,8 +18,12 @@ phases:
     commands:
       - echo $PWD
       - ./migrate-seed-build.sh $DATABASE_URL
+      - mkdir code
+      - cp -r dist ../code
+      - cp package.json ../code
       - cd ../frontend
       - npm run build
+      
       
   post_build:
     commands:
