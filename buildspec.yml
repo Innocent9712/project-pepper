@@ -11,13 +11,15 @@ phases:
       - echo REDIS_URL=\'$REDIS_URL\' >> env
       - cd frontend
       - npm install
-      # - cd ../backend
-      # - npm install
+      - mkdir code
+      - cp -r ../backend code
+      - cd ../backend
+      - npm install
   build:
     commands:
-      # - echo $PWD
-      # - ./migrate-seed-build.sh $DATABASE_URL
-      # - cd ../frontend
+      - echo $PWD
+      - ./migrate-seed-build.sh $DATABASE_URL
+      - cd ../frontend
       - npm run build
       
   post_build:
@@ -33,5 +35,5 @@ artifacts:
     - appspec.yml
     - scripts/*
     - frontend/dist/**/*/
-    - backend/**/*/
+    - code/**/*/
   discard-paths: no
