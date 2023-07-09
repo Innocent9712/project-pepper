@@ -1,7 +1,7 @@
 #!/bin/bash
 sudo apt update
-sudo apt install nodejs
-sudo apt install npm
+sudo apt-get install -y nodejs
+sudo apt-get install -y npm
 
 directory="/var/www/html/"
 
@@ -12,4 +12,3 @@ else
    echo "Directory is not empty"
 fi
 
-# sudo cp project-pepper.service /etc/systemd/system/

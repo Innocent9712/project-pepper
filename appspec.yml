@@ -4,11 +4,15 @@ files:
   - source: /
     destination: /var/www/html
 hooks:
+  ApplicationStop:
+    - location: scripts/applicationstop.sh
+      timeout: 300
+      runas: ubuntu
   BeforeInstall:
     - location: scripts/install_node.sh
       timeout: 300
       runas: ubuntu
-#  AfterInstall:
+#  ApplicationStart:
 #    - location: scripts/start_backend.sh
 #      timeout: 300
  #     runas: ubuntu
