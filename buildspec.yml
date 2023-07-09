@@ -4,6 +4,8 @@ phases:
     runtime-versions:
       nodejs: 18
     commands:
+      - mkdir code
+      - cp -r backend code
       - touch env
       - echo HONEYCOMB_API_KEY=$HONEYCOMB_API_KEY >> env
       - echo OTEL_SERVICE_NAME=$OTEL_SERVICE_NAME >> env
@@ -11,8 +13,6 @@ phases:
       - echo REDIS_URL=\'$REDIS_URL\' >> env
       - cd frontend
       - npm install
-      - mkdir code
-      - cp -r ../backend code
       - cd ../backend
       - npm install
   build:
