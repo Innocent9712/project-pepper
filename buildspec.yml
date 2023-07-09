@@ -20,6 +20,8 @@ phases:
       - ./migrate-seed-build.sh $DATABASE_URL
       - mkdir code
       - cp -r dist ../code
+      - cp -r node_modules/@prisma ../code
+      - cp -r node_modules/prisma ../code
       - cp package.json ../code
       - cd ../frontend
       - npm run build
