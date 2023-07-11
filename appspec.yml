@@ -12,7 +12,7 @@ hooks:
     - location: scripts/install_node.sh
       timeout: 300
       runas: ubuntu
-  ApplicationStart:
+  Install:
     - location: scripts/start_backend.sh
       timeout: 300
       runas: ubuntu
