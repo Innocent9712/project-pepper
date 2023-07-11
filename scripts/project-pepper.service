@@ -3,7 +3,7 @@ Description=Backend Api Service
 After=network.target
 [Service]
 ExecStart=/usr/bin/npm run start-instrumented
-WorkingDirectory=/var/www/html/code
+WorkingDirectory=/var/www/html/code/backend
 Restart=always
 User=ubuntu
 Group=ubuntu
