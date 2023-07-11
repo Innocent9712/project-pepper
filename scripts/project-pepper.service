@@ -2,7 +2,8 @@
 Description=Backend Api Service
 After=network.target
 [Service]
-ExecStart=/usr/bin/npm run start-instrumented
+EnvironmentFile=/var/www/html/env
+ExecStart=/bin/bash -c "REDIS_URL=$REDIS_URL HONEYCOMB_API_KEY=$HONEYCOMB_API_KEY OTEL_SERVICE_NAME=$OTEL_SERVICE_NAME npm run start-instrumented"
 WorkingDirectory=/var/www/html/code/backend
 Restart=always
 User=ubuntu
