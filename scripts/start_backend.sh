@@ -1,6 +1,6 @@
 #!/bin/bash
 cd /var/www/html 
-source env   
+source ./env   
 
 export DATABASE_URL=$DATABASE_URL
 export HONEYCOMB_API_KEY=$HONEYCOMB_API_KEY
