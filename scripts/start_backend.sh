@@ -5,7 +5,7 @@ source ./env
 export DATABASE_URL=$DATABASE_URL
 export HONEYCOMB_API_KEY=$HONEYCOMB_API_KEY
 
-sudo cp project-pepper.service /etc/systemd/system/
+sudo cp scripts/project-pepper.service /etc/systemd/system/
 cd code/backend
 sudo npm i
 sudo ./migrate-seed-build.sh $DATABASE_URL
