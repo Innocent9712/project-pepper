@@ -2,6 +2,12 @@
 sudo apt update
 curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
 sudo apt install -y nodejs
+sudo apt install -y apache2
+
+sudo cp scripts/project-pepper.conf /etc/apache2/sites-available/
+sudo a2dissite 000-default.conf
+sudo a2ensite project-pepper.conf
+sudo systemctl reload apache2
 
 directory="/var/www/html/"
 
