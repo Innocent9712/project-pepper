@@ -25,9 +25,9 @@ phases:
   post_build:
     commands:
     # - cd ../frontend 
-      - echo "Uploading to S3.."
-      - aws s3 cp dist s3://"${S3_BUCKET}" --recursive
-      - echo "Done."
+    #  - echo "Uploading to S3.."
+    #  - aws s3 cp dist s3://"${S3_BUCKET}" --recursive
+    #  - echo "Done."
 
 artifacts:
   files:
