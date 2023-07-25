@@ -5,6 +5,8 @@ sudo apt install -y nodejs
 sudo apt install -y apache2
 
 sudo cp scripts/project-pepper.conf /etc/apache2/sites-available/
+sudo a2enmod proxy
+sudo a2enmod proxy_http
 sudo a2dissite 000-default.conf
 sudo a2ensite project-pepper.conf
 sudo systemctl reload apache2
