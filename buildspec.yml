@@ -24,8 +24,8 @@ phases:
       - npm run build
   post_build:
     commands:
-    # - cd ../frontend 
-    #  - echo "Uploading to S3.."
+     - cd ..
+     - cp scripts/.htaccess frontend/dist
     #  - aws s3 cp dist s3://"${S3_BUCKET}" --recursive
     #  - echo "Done."
 
