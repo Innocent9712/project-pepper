@@ -5,6 +5,14 @@ source ./env
 export DATABASE_URL=$DATABASE_URL
 export HONEYCOMB_API_KEY=$HONEYCOMB_API_KEY
 
+sudo cp scripts/project-pepper.conf /etc/apache2/sites-available/
+sudo a2enmod proxy
+sudo a2enmod proxy_http
+sudo a2enmod rewrite
+sudo a2dissite 000-default.conf
+sudo a2ensite project-pepper.conf
+sudo systemctl reload apache2
+
 sudo cp scripts/project-pepper.service /etc/systemd/system/
 cd code/backend
 sudo npm i
